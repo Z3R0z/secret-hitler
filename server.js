@@ -2025,6 +2025,21 @@ function handle(ws, msg) {
       break;
     }
 
+    case 'investigationClaim': {
+      const room = rooms.get(meta.roomCode);
+      if (!room || room.phase !== 'active') return;
+      const player = room.players.find(p => p.id === meta.playerId);
+      if (!player) return;
+      const { targetName, claimedParty } = msg;
+      if (!targetName || (claimedParty !== 'Liberal' && claimedParty !== 'Fascist')) return;
+      const partyColor = claimedParty === 'Liberal' ? '#2563eb' : '#c0392b';
+      const partyLetter = claimedParty === 'Liberal' ? 'B' : 'R';
+      addLog(room, { type: 'claim', text: `${player.name} claims ${targetName} is <span style="color:${partyColor};font-weight:700;">${partyLetter} (${claimedParty})</span>`, meta: `ROUND ${room.round} · INVESTIGATION CLAIM` });
+      room.lastActive = Date.now();
+      broadcastState(room);
+      break;
+    }
+
     case 'addNote': {
       const room = rooms.get(meta.roomCode);
       if (!room || room.phase !== 'active') return;

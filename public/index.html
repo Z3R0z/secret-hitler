@@ -801,6 +801,14 @@ function handle(msg){
     case 'roleReveal': myRole=msg.role; showRoleReveal(msg); break;
     case 'peek': myPeekCards=msg.cards; renderPhasePanel(); break;
     case 'investigate': myInvestResult={targetName:msg.targetName,party:msg.party}; renderPhasePanel(); break;
+    case 'promptClaim':
+      if(msg.claimRole==='president' && presCardsReceived && !pendingClaim){
+        pendingClaim='president';
+        pendingClaimQueue=[];
+        selectedClaim=null;
+        renderPhasePanel();
+      }
+      break;
     case 'chat': appendChat(msg); break;
     case '7tv': if(msg.emotes) msg.emotes.forEach(e=>{ if(e.id&&e.name&&!seventvEmotes[e.name]){ seventvEmotes[e.name]={url:`https://cdn.7tv.app/emote/${e.id}/1x.webp`,url2x:`https://cdn.7tv.app/emote/${e.id}/2x.webp`,id:e.id,name:e.name}; }}); break;
     case 'specialEvent': handleSpecialEvent(msg.event); break;
@@ -922,7 +930,6 @@ function renderGame(){
   document.getElementById('g-code').textContent=r.code;
   document.getElementById('g-name').textContent=r.settings?.gameName?r.settings.gameName+' · ':'';
   document.getElementById('g-round').textContent=`ROUND ${r.round}`;
-  checkPresClaim(r);
   renderPlayers(); renderTracks(); renderElect(); renderPhasePanel(); renderClaimPanel(); renderLog(); loadNotes(); updateTimer(); checkKillSound();
 }
 
@@ -1311,19 +1318,6 @@ function renderMatOverlay(phaseHtml, rp, mine){
     status.classList.remove('open');
     status.innerHTML='';
   }
-}
-
-// ─── PRESIDENT CLAIM DETECTION ───────────────────────────────
-let _lastEnactCount=0;
-function checkPresClaim(r){
-  const enacts=r.log?r.log.filter(e=>e.type==='chan').length:0;
-  if(enacts>_lastEnactCount && presCardsReceived && !pendingClaim){
-    // A policy was just enacted and we were president with saved cards
-    pendingClaim='president';
-    pendingClaimQueue=[];
-    selectedClaim=null;
-  }
-  _lastEnactCount=enacts;
 }
 
 // ─── PHASE ACTIONS ───────────────────────────────────────────

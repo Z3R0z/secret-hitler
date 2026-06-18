@@ -1292,8 +1292,14 @@ function triggerBotActions(room) {
           scheduleBotChat(room, 'accuse', { target: suspectTarget.name });
         }, 4000 + Math.random() * 2000);
       }
-      // Bot claims (capture round before it advances)
+      // Claims (capture round before it advances)
       const claimRound = room.round;
+      // Human president gets prompted to claim
+      if (!presBot.isBot) {
+        sendTo(room.code, presBot.id, { type: 'promptClaim', claimRole: 'president' });
+        startClaimWindow(room);
+      }
+      // Bot president claim
       if (presBot.isBot && room._lastPresId === presBot.id) {
         const presClaimed = botPresidentClaim(room, presBot, room._lastPresDrew || ['F','F','F'], enacted);
         setTimeout(() => {
@@ -1301,6 +1307,7 @@ function triggerBotActions(room) {
           submitBotClaim(room, presBot, 'president', presClaimed, claimRound);
         }, 1500 + Math.random() * 1500);
       }
+      // Bot chancellor claim
       const chanClaimed = botChancellorClaim(room, chan, receivedCopy, enacted);
       setTimeout(() => {
         if (!rooms.has(room.code)) return;

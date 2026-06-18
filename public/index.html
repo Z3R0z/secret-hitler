@@ -510,7 +510,7 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
   <div class="hdr" style="padding:.9rem 0 .7rem;"><div class="title" style="font-size:1.6rem;">SECRET HITLER</div><div class="subtitle">Waiting Room</div><button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button></div>
   <div class="wr-wrap">
     <div class="code-box">
-      <div class="code-hint">ROOM CODE — CLICK TO COPY</div>
+      <div class="code-hint">ROOM CODE — CLICK TO COPY INVITE LINK</div>
       <div class="big-code" id="wr-code" onclick="copyCode()">—</div>
       <div class="code-hint" id="wr-cnt" style="margin-top:.28rem;">0 players</div>
     </div>
@@ -821,7 +821,8 @@ function rememberName(n){ localStorage.setItem('sh-name',n); customStvSets=JSON.
 function doCreate(){ const n=document.getElementById('l-name').value.trim(); if(!n){toast('Enter your name','err');return;} rememberName(n); send({type:'create',name:n}); }
 function doJoin(){ const n=document.getElementById('l-name').value.trim(),c=document.getElementById('l-code').value.trim().toUpperCase(); if(!n){toast('Enter your name','err');return;} if(!c){toast('Enter a room code','err');return;} rememberName(n); send({type:'join',name:n,code:c}); }
 function doLeave(){ send({type:'leave'}); clearSess(); myRole=null; lastSavedGame=null; pendingClaim=null; selectedClaim=null; chatMessages=[]; showScreen('s-lobby'); document.getElementById('win-bg').classList.remove('open'); closeCardModal(); }
-function copyCode(){ navigator.clipboard.writeText(myRoom?.code||'').then(()=>toast('Code copied!','ok')).catch(()=>toast(myRoom?.code||'')); }
+function getInviteLink(code){ return `${location.origin}/${code}`; }
+function copyCode(){ const link=getInviteLink(myRoom?.code||''); navigator.clipboard.writeText(link).then(()=>toast('Invite link copied!','ok')).catch(()=>toast(link)); }
 
 // ─── WAITING ROOM ────────────────────────────────────────────
 function initWaiting(){
@@ -1936,6 +1937,16 @@ document.getElementById('chat-input').addEventListener('keydown',e=>{ if(e.key==
     div.classList.remove('dragging');
     document.body.style.cursor=''; document.body.style.userSelect='';
   });
+})();
+
+// Auto-fill invite code from URL
+(function(){
+  const m=location.pathname.match(/^\/([A-Za-z0-9]{4})$/);
+  if(m){
+    const code=m[1].toUpperCase();
+    document.getElementById('l-code').value=code;
+    history.replaceState(null,'','/');
+  }
 })();
 
 renderProfile();

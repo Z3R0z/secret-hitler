@@ -2077,5 +2077,10 @@ app.get('/api/room/:code', (req, res) => {
   res.json(roomView(r));
 });
 
+// Invite link: /:code serves index.html so the client can auto-join
+app.get('/:code([A-Za-z0-9]{4})', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Secret Hitler server on port ${PORT}`));

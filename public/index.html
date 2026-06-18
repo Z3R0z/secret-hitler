@@ -804,6 +804,7 @@ function handle(msg){
     case 'promptClaim':
       if(msg.claimRole==='president' && presCardsReceived && !pendingClaim){
         pendingClaim='president';
+        pendingClaimRound=msg.round||null;
         pendingClaimQueue=[];
         selectedClaim=null;
         renderPhasePanel();
@@ -1322,7 +1323,7 @@ function renderMatOverlay(phaseHtml, rp, mine){
 
 // ─── PHASE ACTIONS ───────────────────────────────────────────
 function doVote(v){ send({type:'vote',v}); }
-let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[];
+let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[], pendingClaimRound=null;
 function doPresDiscard(idx){
   presCardsReceived=myRoom.drawnCards?[...myRoom.drawnCards]:null;
   closeCardModal();
@@ -1331,8 +1332,8 @@ function doPresDiscard(idx){
 function doChanEnact(idx){
   chanCardsReceived=myRoom.passedCardsPrivate?[...myRoom.passedCardsPrivate]:null;
   closeCardModal();
+  pendingClaimRound=myRoom.round;
   send({type:'chanEnact',enactIdx:idx});
-  // Queue president claim first, then chancellor
   pendingClaimQueue=[];
   if(presCardsReceived) pendingClaimQueue.push('president');
   pendingClaimQueue.push('chancellor');
@@ -1391,7 +1392,7 @@ function submitClaim(){
     ['L','L'],['L','F'],['F','F'],
   ];
   const cards=combos[selectedClaim];
-  send({type:'claim',claimRole:pendingClaim,cards});
+  send({type:'claim',claimRole:pendingClaim,cards,round:pendingClaimRound});
   if(isPres) presCardsReceived=null;
   else chanCardsReceived=null;
   selectedClaim=null;

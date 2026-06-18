@@ -1296,7 +1296,7 @@ function triggerBotActions(room) {
       const claimRound = room.round;
       // Human president gets prompted to claim
       if (!presBot.isBot) {
-        sendTo(room.code, presBot.id, { type: 'promptClaim', claimRole: 'president' });
+        sendTo(room.code, presBot.id, { type: 'promptClaim', claimRole: 'president', round: claimRound });
         startClaimWindow(room);
       }
       // Bot president claim
@@ -2011,12 +2011,13 @@ function handle(ws, msg) {
       const player = room.players.find(p => p.id === meta.playerId);
       if (!player) return;
       const { claimRole, cards } = msg;
+      const claimRound = msg.round || room.round;
       if (claimRole !== 'president' && claimRole !== 'chancellor') return;
       if (!Array.isArray(cards) || cards.length < 1 || cards.length > 3) return;
       if (!cards.every(c => c === 'L' || c === 'F')) return;
       const cardStr = cards.map(c => c === 'L' ? '<span style="color:#2563eb;font-weight:700;">B</span>' : '<span style="color:#c0392b;font-weight:700;">R</span>').join(' ');
       const roleLabel = claimRole === 'president' ? 'Pres.' : 'Chan.';
-      addLog(room, { type: 'claim', text: `${player.name} (${roleLabel}): ${cardStr}`, meta: `ROUND ${room.round} · CLAIM` });
+      addLog(room, { type: 'claim', text: `${player.name} (${roleLabel}): ${cardStr}`, meta: `ROUND ${claimRound} · CLAIM`, round: claimRound });
       clearClaimWindow(room);
       room.lastActive = Date.now();
       broadcastState(room);

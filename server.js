@@ -460,7 +460,7 @@ function pickBotName(room) {
 }
 
 // ─── BOT AI ───────────────────────────────────────────────
-function botDelay() { return 600 + Math.random() * 1200; }
+function botDelay() { return 300 + Math.random() * 700; }
 
 const CLAIM_WINDOW_MS = 10000;
 

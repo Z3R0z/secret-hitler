@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Hitler</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+:root{
+  --bg:#fff; --bg2:#f5f5f5; --bg3:#eaeaea;
+  --border:#ddd; --border2:#ccc;
+  --text:#111; --text2:#555; --text3:#999;
+  --accent:#b8860b;
+  --red:#c0392b; --red-bg:#fef2f2;
+  --blue:#2563eb; --blue-bg:#eff6ff;
+  --green:#16a34a;
+  --shadow:0 2px 6px rgba(0,0,0,.08);
+}
+[data-theme="dark"]{
+  --bg:#111; --bg2:#1a1a1a; --bg3:#252525;
+  --border:#333; --border2:#444;
+  --text:#eee; --text2:#aaa; --text3:#666;
+  --accent:#d4a017;
+  --red:#ef4444; --red-bg:#2a1515;
+  --blue:#60a5fa; --blue-bg:#151e2a;
+  --green:#4ade80;
+  --shadow:0 2px 6px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:1.05rem;}
+.screen{display:none;min-height:100vh;padding:1.2rem;animation:fadeIn .2s ease;}.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* HEADER */
+.hdr{text-align:center;padding:1.2rem 0 .9rem;border-bottom:2px solid var(--accent);margin-bottom:1.2rem;position:relative;background:var(--bg);}
+.hdr::before,.hdr::after{content:'✦';color:var(--accent);font-size:.9rem;position:absolute;bottom:-.5rem;background:var(--bg);padding:0 .4rem;}
+.hdr::before{left:15%;}.hdr::after{right:15%;}
+.title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,3rem);font-weight:900;letter-spacing:.05em;color:var(--red);line-height:1;}
+.subtitle{font-family:'Special Elite',monospace;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text3);margin-top:.25rem;}
+
+/* FORMS */
+.wrap{max-width:440px;margin:0 auto;}
+.lbl{font-family:'Special Elite',monospace;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.45rem;display:block;}
+.fi{width:100%;background:var(--bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Crimson Text',serif;font-size:1rem;padding:.45rem .7rem;transition:border-color .2s;margin-bottom:.85rem;box-shadow:inset 0 1px 3px rgba(0,0,0,.07);}
+.fi:focus{outline:none;border-color:var(--accent);box-shadow:inset 0 1px 3px rgba(0,0,0,.07),0 0 0 3px rgba(0,0,0,.06);}
+.fi::placeholder{color:var(--text3);}
+.divider{display:flex;align-items:center;gap:.7rem;margin:.65rem 0;color:var(--text3);font-family:'Special Elite',monospace;font-size:.62rem;letter-spacing:.2em;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.conn-bar{font-family:'Special Elite',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--text3);margin-bottom:.9rem;display:flex;align-items:center;gap:.38rem;}
+.cdot{width:7px;height:7px;border-radius:50%;background:#e74c3c;flex-shrink:0;transition:background .3s;}
+.cdot.ok{background:#27ae60;}
+
+/* BUTTONS */
+.btn{display:inline-block;font-family:'Special Elite',monospace;font-size:.85rem;letter-spacing:.13em;text-transform:uppercase;border:none;border-radius:5px;cursor:pointer;padding:.65rem 1.3rem;transition:all .18s;white-space:nowrap;box-shadow:var(--shadow);}
+.btn-primary{background:var(--red);color:#fff;font-weight:700;}
+.btn-primary:hover{background:var(--red);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:var(--shadow);}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border2);}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.btn-secondary:disabled{opacity:.38;cursor:not-allowed;}
+.btn-gold{background:var(--accent);color:var(--bg);font-weight:700;}
+.btn-gold:hover{background:var(--accent);transform:translateY(-1px);}
+.btn-gold:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+.btn-lib{background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue);}
+.btn-lib:hover{background:var(--blue-bg);}
+.btn-fas{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red);}
+.btn-fas:hover{background:var(--red-bg);}
+.btn-danger{background:var(--bg2);color:var(--red);border:1.5px solid var(--red);}
+.btn-danger:hover{background:var(--red-bg);}
+.btn-sm{padding:.35rem .9rem;font-size:.75rem;}
+.btn-block{width:100%;text-align:center;display:block;}
+
+/* CARD */
+.card{background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:1rem 1.1rem;box-shadow:var(--shadow);}
+
+/* WAITING ROOM */
+.wr-wrap{max-width:580px;margin:0 auto;}
+.code-box{text-align:center;padding:1.3rem;background:var(--bg2);border:1.5px solid var(--accent);border-radius:8px;margin-bottom:1.2rem;box-shadow:var(--shadow);}
+.big-code{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;color:var(--red);letter-spacing:.15em;cursor:pointer;user-select:all;}
+.code-hint{font-family:'Special Elite',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--text3);margin-top:.25rem;}
+.count-row{display:flex;gap:.35rem;margin-bottom:.95rem;flex-wrap:wrap;}
+.cnt-btn{flex:1;min-width:40px;background:var(--bg2);border:1.5px solid var(--border);color:var(--text);font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;padding:.5rem .38rem;border-radius:4px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
+.cnt-btn.active{background:var(--red);color:#fff;border-color:var(--red);}
+.cnt-btn:disabled{opacity:.35;cursor:not-allowed;}
+.slots{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem;}
+.slot{display:flex;align-items:center;gap:.58rem;padding:.46rem .7rem;background:var(--bg2);border:1.5px solid var(--border);border-radius:4px;}
+.slot.filled{border-color:var(--accent);background:var(--bg);}
+.slot.is-me{border-color:var(--red);background:var(--red-bg);}
+.slot-n{font-family:'Special Elite',monospace;color:var(--accent);font-size:.63rem;width:16px;text-align:right;flex-shrink:0;}
+.slot-name{flex:1;font-size:.93rem;}
+.slot-empty{color:var(--text3);font-style:italic;font-size:.85rem;}
+.tag{font-family:'Special Elite',monospace;font-size:.52rem;letter-spacing:.1em;padding:.07rem .36rem;border-radius:20px;}
+.tag-you{color:var(--red);background:var(--red-bg);border:1px solid var(--red);}
+.tag-host{color:var(--text2);background:var(--bg3);border:1px solid var(--border);}
+.tag-dc{color:var(--red);background:var(--red-bg);}
+.order-row{display:flex;gap:.36rem;flex-wrap:wrap;margin-bottom:.85rem;}
+.chip{display:flex;align-items:center;gap:.28rem;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.19rem .56rem .19rem .24rem;font-size:.78rem;}
+.chip-n{width:17px;height:17px;border-radius:50%;background:var(--red);color:#fff;font-family:'Special Elite',monospace;font-size:.58rem;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;}
+
+/* ═══ GAME LAYOUT ═══ */
+.g-wrap{max-width:100%;margin:0;}
+#s-game{padding:.6rem .6rem .6rem .3rem;}
+.g-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;flex-wrap:wrap;padding-bottom:.3rem;border-bottom:1px solid var(--border);}
+.g-grid{display:flex;gap:0;align-items:stretch;height:calc(100vh - 90px);}
+.g-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:.4rem;overflow-y:auto;padding-right:.4rem;}
+.g-divider{width:8px;background:var(--border);cursor:col-resize;flex-shrink:0;border-radius:4px;transition:background .15s;position:relative;}
+.g-divider:hover,.g-divider.dragging{background:var(--accent);}
+.g-divider::after{content:'';position:absolute;inset:-6px;}
+.g-right{flex:1;min-width:200px;display:flex;flex-direction:column;gap:.4rem;overflow-y:auto;padding-left:.5rem;}
+@media(max-width:800px){.g-grid{flex-direction:column;height:auto;}.g-divider{display:none;}.g-left,.g-right{padding:0;}}
+
+/* ── PLAYER STRIP ── */
+.player-strip{display:flex;gap:.5rem;overflow-x:auto;padding:.5rem 0;scrollbar-width:thin;flex-shrink:0;flex-wrap:wrap;justify-content:center;}
+.player-strip::-webkit-scrollbar{height:5px;}
+.player-strip::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.pcard{display:flex;flex-direction:column;align-items:center;width:100px;min-width:80px;cursor:default;position:relative;flex-shrink:0;}
+.pcard-art{width:100%;aspect-ratio:11/14;border-radius:10px;border:3.5px solid var(--border2);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:all .2s;}
+.pcard-art.role-liberal{border-color:var(--blue);background:var(--blue-bg);}
+.pcard-art.role-fascist{border-color:var(--red);background:var(--red-bg);}
+.pcard-art.role-hitler{border-color:var(--accent);background:#f5eedd;}
+.pcard-art .role-icon{font-size:3rem;line-height:1;}
+.pcard-art .role-q{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:var(--border2);line-height:1;}
+.pcard-art .role-lbl{font-family:'Special Elite',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;}
+.pcard-art.role-liberal .role-lbl{color:var(--blue);}
+.pcard-art.role-fascist .role-lbl{color:var(--red);}
+.pcard-art.role-hitler .role-lbl{color:var(--accent);}
+.pcard-art.role-unknown .role-lbl{color:var(--text3);}
+.pcard.dead .pcard-art{opacity:.3;filter:grayscale(1);}
+.pcard.is-pres .pcard-art{box-shadow:0 0 0 4px var(--accent);}
+.pcard.is-chan .pcard-art{box-shadow:0 0 0 4px var(--blue);}
+.pcard-name{font-family:'Special Elite',monospace;font-size:.95rem;letter-spacing:.05em;color:var(--text);text-align:center;margin-top:.35rem;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pcard-tag{position:absolute;top:-8px;right:-8px;font-size:1.2rem;padding:.1rem .2rem;border-radius:8px;z-index:2;line-height:1;}
+.pcard-tag.tag-pres{background:var(--accent);}
+.pcard-tag.tag-chan{background:var(--blue);}
+.pcard-tag.tag-nom{background:var(--text3);}
+.pcard-tag.tag-you{background:var(--red);}
+.pcard-tag.tag-dead{background:var(--text3);}
+.pcard-sub{font-family:'Special Elite',monospace;font-size:.7rem;color:var(--text3);margin-top:.1rem;}
+.pcard-legend{display:flex;gap:1rem;flex-wrap:wrap;padding:.35rem 0;font-family:'Special Elite',monospace;font-size:.82rem;color:var(--text3);letter-spacing:.05em;flex-shrink:0;justify-content:center;}
+.pcard-legend span{display:flex;align-items:center;gap:.3rem;}
+
+/* ── MAT OVERLAY (vote, phase, claims) ── */
+.mat-overlay{position:absolute;inset:0;background:rgba(0,0,0,.75);border-radius:8px;z-index:10;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px);animation:fadeIn .15s ease;overflow-y:auto;}
+.mat-overlay.open{display:flex;}
+.mat-status{background:var(--bg2);border:1.5px solid var(--border);border-radius:6px;padding:.45rem .75rem;font-size:.85rem;color:var(--text2);display:none;align-items:center;gap:.4rem;animation:fadeIn .15s ease;margin-top:.4rem;}
+.mat-status.open{display:flex;}
+.mat-status .phase-title{font-size:.9rem;margin:0;color:var(--text);}
+.mat-status .phase-desc{font-size:.8rem;margin:0;color:var(--text3);}
+.mat-overlay .phase-title{color:#fff;font-size:1rem;margin-bottom:.25rem;flex-wrap:wrap;justify-content:center;}
+.mat-overlay .phase-desc{color:rgba(255,255,255,.65);font-size:.85rem;margin-bottom:.4rem;text-align:center;}
+.mat-overlay .vote-btns{display:flex;gap:.5rem;margin-bottom:.4rem;}
+.mat-overlay .vote-grid{max-width:100%;justify-content:center;}
+.mat-overlay .vote-chip{font-size:.75rem;padding:.2rem .5rem;}
+.mat-overlay .player-picker{max-height:180px;overflow-y:auto;width:100%;}
+.mat-overlay .pp-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:#fff;}
+.mat-overlay .pp-btn:hover{background:rgba(255,255,255,.15);border-color:var(--accent);}
+.mat-overlay .pp-btn:disabled{opacity:.25;}
+.mat-overlay .claim-panel{background:transparent;border-color:var(--accent);margin:0;padding:.6rem .8rem;}
+.mat-overlay .claim-title{color:var(--accent);}
+.mat-overlay .claim-combo{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#fff;}
+.mat-overlay .claim-combo:hover{border-color:var(--accent);background:rgba(255,255,255,.1);}
+.mat-overlay .claim-combo.sel{border-color:var(--accent);background:rgba(255,255,255,.12);}
+.mat-overlay .claim-combo-label{color:rgba(255,255,255,.6);}
+.vote-result-box{text-align:center;padding:.5rem;border-radius:6px;border:1.5px solid;margin-bottom:.35rem;}
+.vote-result-box.ja{background:rgba(22,163,74,.15);border-color:var(--green);}
+.vote-result-box.nein{background:rgba(192,57,43,.15);border-color:var(--red);}
+.vote-result-box .vr-label{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;}
+.vote-result-box.ja .vr-label{color:var(--green);}
+.vote-result-box.nein .vr-label{color:var(--red);}
+.vote-result-box .vr-tally{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.1rem;}
+
+/* ── LOG FILTER ── */
+.log-filter{display:flex;gap:.25rem;margin-bottom:.5rem;flex-wrap:wrap;}
+.log-filter-btn{background:none;border:1px solid var(--border);color:var(--text3);font-family:'Special Elite',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .45rem;border-radius:12px;cursor:pointer;transition:all .15s;}
+.log-filter-btn:hover{border-color:var(--text2);color:var(--text2);}
+.log-filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ═══ GAME MAT ═══ */
+.mat{position:relative;border-radius:10px;padding:.7rem .8rem .6rem;border:4px solid;overflow:hidden;flex-shrink:0;}
+.mat::before{content:'';position:absolute;inset:6px;border:2px solid rgba(255,255,255,.12);border-radius:6px;pointer-events:none;z-index:1;}
+.mat-lib{background:linear-gradient(135deg,#1e3a6e,#2a5090);border-color:#4a80c0;margin-bottom:.6rem;}
+.mat-fas{background:linear-gradient(135deg,#6e1e1e,#902a2a);border-color:#c04a4a;}
+.mat-header{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.55rem;position:relative;z-index:2;}
+.mat-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+.mat-slots{display:flex;gap:.45rem;position:relative;z-index:2;}
+.mat-slot{flex:1;aspect-ratio:3/4;min-height:60px;border-radius:6px;border:2px dashed rgba(255,255,255,.2);background:rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:all .3s;}
+.mat-slot.filled{border-style:solid;border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.1);}
+.mat-slot .slot-card{width:100%;height:100%;object-fit:contain;border-radius:3px;}
+.mat-slot .slot-empty{font-size:1.2rem;opacity:.2;}
+.mat-slot .slot-pwr{font-family:'Special Elite',monospace;font-size:.5rem;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:.2rem;text-align:center;line-height:1.2;white-space:nowrap;}
+.mat-slot.filled .slot-pwr{opacity:.4;text-decoration:line-through;}
+.mat-fas .mat-slot:nth-last-child(-n+2):not(:last-child) .slot-pwr{color:#fca5a5;}
+.mat-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.45rem;position:relative;z-index:2;gap:.5rem;}
+.mat-info{font-family:'Special Elite',monospace;font-size:.7rem;letter-spacing:.08em;color:rgba(255,255,255,.45);}
+.mat-fas-warn{font-family:'Special Elite',monospace;font-size:.58rem;letter-spacing:.06em;color:#fca5a5;background:rgba(0,0,0,.25);padding:.2rem .5rem;border-radius:3px;text-align:center;margin-top:.35rem;position:relative;z-index:2;}
+.sidebar-tracker{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.5rem .35rem;background:var(--bg2);border:2px solid var(--border);border-radius:8px;}
+.sidebar-tracker-lbl{font-family:'Special Elite',monospace;font-size:.65rem;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;text-align:center;}
+.mat-tracker-pips{display:flex;flex-direction:column;gap:.3rem;}
+.mat-pip{width:32px;height:32px;border-radius:50%;border:2.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-family:'Special Elite',monospace;color:var(--border2);transition:all .2s;}
+.mat-pip.on{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.sidebar-tracker-arrow{font-size:.75rem;color:var(--text3);}
+.mat-tracker-chaos{font-family:'Special Elite',monospace;font-size:.65rem;color:var(--red);letter-spacing:.05em;}
+/* ── CARD PILES (vertical sidebar) ── */
+.board-row{display:flex;gap:.2rem;align-items:stretch;}
+.piles-col{display:flex;flex-direction:column;gap:.5rem;justify-content:center;align-items:center;flex-shrink:0;width:110px;}
+.board-mats{flex:1;min-width:0;}
+.pile{display:flex;flex-direction:column;align-items:center;gap:.2rem;}
+.pile-cards{position:relative;width:88px;height:114px;}
+.pile-card{position:absolute;width:84px;height:110px;border-radius:8px;background:var(--bg3);border:3px solid var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.pile-card::before{content:'';position:absolute;inset:4px;border:2px solid var(--border);border-radius:5px;}
+.pile-card:nth-child(1){top:0;left:0;}
+.pile-card:nth-child(2){top:2px;left:2px;}
+.pile-card:nth-child(3){top:4px;left:4px;}
+.pile-icon{font-size:1.4rem;opacity:.5;z-index:1;}
+.pile-lbl{font-family:'Playfair Display',serif;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);z-index:1;}
+.pile-count{font-family:'Special Elite',monospace;font-size:1rem;letter-spacing:.05em;color:var(--text2);font-weight:700;}
+.pile-sub{font-family:'Special Elite',monospace;font-size:.6rem;color:var(--text3);letter-spacing:.04em;}
+
+/* LIVE BADGE */
+.live-badge{display:inline-flex;align-items:center;gap:.38rem;font-family:'Special Elite',monospace;font-size:.72rem;letter-spacing:.14em;color:var(--green);padding:.2rem .6rem;border:1px solid var(--green);border-radius:20px;background:var(--bg2);}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* PHASE PANEL */
+.phase-panel{background:var(--bg2);border:1.5px solid var(--border2);border-radius:8px;padding:1.2rem 1.3rem;margin-bottom:.75rem;box-shadow:var(--shadow);animation:fadeIn .25s ease;}
+.phase-panel.mine{border-color:var(--accent);background:var(--bg2);}
+.phase-title{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--text);margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem;font-weight:700;}
+.phase-desc{font-size:1.05rem;color:var(--text2);margin-bottom:.7rem;line-height:1.5;}
+.phase-action{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;}
+
+/* CARD MODAL (centered popup for card selection) */
+.card-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:120;backdrop-filter:blur(6px);}
+.card-modal-bg.open{display:flex;}
+.card-modal{background:var(--bg);border:2px solid var(--accent);border-radius:12px;padding:1.8rem 2rem;width:min(480px,95vw);box-shadow:0 12px 40px rgba(0,0,0,.35);text-align:center;animation:cardPop .25s ease;}
+@keyframes cardPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.card-modal .phase-title{justify-content:center;}
+.card-modal .phase-desc{text-align:center;}
+.cards-row{display:flex;gap:1rem;flex-wrap:wrap;margin:.65rem 0;justify-content:center;}
+.policy-card{width:90px;height:120px;cursor:pointer;transition:all .2s;flex-shrink:0;position:relative;box-shadow:var(--shadow);border:none;background:none;border-radius:4px;overflow:hidden;padding:0;}
+.policy-card:hover{transform:translateY(-8px);box-shadow:0 8px 24px rgba(0,0,0,.22);}
+.policy-card img{width:100%;height:100%;display:block;object-fit:contain;}
+.discard-hint{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-family:'Special Elite',monospace;font-size:.42rem;letter-spacing:.06em;color:var(--text2);text-transform:uppercase;z-index:3;background:rgba(255,255,255,.7);padding:1px 0;border-radius:0 0 3px 3px;}
+
+/* VOTE */
+.vote-grid{display:flex;flex-wrap:wrap;gap:.38rem;margin:.48rem 0;}
+.vote-chip{display:flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:20px;font-size:.95rem;border:1.5px solid;}
+.vote-chip.ja{background:var(--bg2);border-color:var(--green);color:var(--green);}
+.vote-chip.nein{background:var(--red-bg);border-color:var(--red);color:var(--red);}
+.vote-chip.waiting{background:var(--bg2);border-color:var(--border);color:var(--text3);}
+.vote-btns{display:flex;gap:.5rem;flex-wrap:wrap;}
+.vbtn{flex:1;min-width:90px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:5px;color:var(--text);font-family:'Special Elite',monospace;font-size:.95rem;letter-spacing:.1em;padding:.6rem;cursor:pointer;transition:all .18s;text-transform:uppercase;box-shadow:var(--shadow);}
+.vbtn:hover{border-color:var(--border2);transform:translateY(-1px);}
+
+/* PLAYER PICKER (card-based) */
+.pick-strip{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:.4rem 0;}
+.pick-card{display:flex;flex-direction:column;align-items:center;background:none;border:none;cursor:pointer;padding:0;transition:all .15s;position:relative;}
+.pick-card:hover{transform:translateY(-4px);}
+.pick-card:hover .pcard-art{box-shadow:0 0 0 3px var(--accent);}
+.pick-card:disabled,.pick-card.disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
+.pick-card .pcard-art{width:80px;height:102px;border-radius:8px;font-size:inherit;}
+.pick-card .role-icon{font-size:2.2rem;}
+.pick-card .role-q{font-size:2.8rem;}
+.pick-card .role-lbl{font-size:.6rem;}
+.pick-name{font-family:'Special Elite',monospace;font-size:.75rem;color:#fff;margin-top:.2rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+.pick-blocked{font-family:'Special Elite',monospace;font-size:.42rem;color:var(--red);letter-spacing:.04em;margin-top:.1rem;text-transform:uppercase;}
+
+/* DOCK PANELS */
+.dock-panel{background:var(--bg);border:1.5px solid var(--border);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;transition:flex .2s ease;min-height:0;}
+.dock-panel.expanded{flex:1;}
+.dock-panel.collapsed{flex:0 0 auto;}
+.dock-header{display:flex;align-items:center;gap:.4rem;padding:.35rem .6rem;background:var(--bg2);border-bottom:1px solid var(--border);cursor:grab;user-select:none;flex-shrink:0;}
+.dock-header:active{cursor:grabbing;}
+.dock-title{font-family:'Special Elite',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);flex:1;}
+.dock-badge{display:none;color:var(--red);font-size:.6rem;}
+.dock-toggle{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:0 .2rem;transition:transform .2s;}
+.dock-panel.collapsed .dock-toggle{transform:rotate(-90deg);}
+.dock-panel.collapsed .dock-body{display:none;}
+.dock-body{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.dock-panel.dragging{opacity:.5;border-color:var(--accent);}
+.dock-drop{height:3px;background:var(--accent);border-radius:2px;margin:.2rem 0;display:none;}
+.dock-drop.visible{display:block;}
+
+/* LOG */
+.log-wrap{overflow-y:auto;display:flex;flex-direction:column;gap:.35rem;padding-right:3px;}
+.log-wrap::-webkit-scrollbar{width:4px;}
+.log-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.log-entry{background:var(--bg);border-left:3px solid var(--border2);border-radius:0 4px 4px 0;padding:.6rem .85rem;font-size:1rem;display:flex;align-items:flex-start;gap:.6rem;animation:slideIn .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+@keyframes slideIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
+.le-pres{border-left-color:var(--accent);background:var(--bg2);}
+.le-chan{border-left-color:var(--blue);background:var(--blue-bg);}
+.le-elect{border-left-color:var(--accent);background:var(--bg2);}
+.le-inv{border-left-color:var(--accent);}
+.le-veto{border-left-color:var(--red);}
+.le-kill{border-left-color:var(--red);background:var(--red-bg);}
+.le-chaos{border-left-color:var(--red);background:var(--red-bg);}
+.le-note{border-left-color:var(--border2);opacity:.72;}
+.log-icon{font-size:1.1rem;flex-shrink:0;margin-top:.04rem;}
+.log-body{flex:1;min-width:0;}
+.log-meta{font-family:'Special Elite',monospace;font-size:.68rem;color:var(--text3);letter-spacing:.1em;margin-bottom:.12rem;}
+.log-text{line-height:1.4;word-break:break-word;}
+.log-del{margin-left:auto;background:none;border:none;color:var(--border);cursor:pointer;font-size:.78rem;padding:0 .2rem;transition:color .18s;flex-shrink:0;}
+.log-del:hover{color:var(--red);}
+.rnd-hdr{text-align:center;font-family:'Special Elite',monospace;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);padding:.22rem 0;border-bottom:1px solid var(--border);margin:.18rem 0;}
+.help-txt{text-align:center;color:var(--text3);font-style:italic;font-size:.8rem;padding:.5rem;}
+
+/* LOCAL NOTES */
+.my-notes{width:100%;min-height:140px;background:var(--bg);border:1.5px solid var(--border2);border-radius:5px;color:var(--text);font-family:'Crimson Text',serif;font-size:1.05rem;padding:.6rem .85rem;resize:vertical;line-height:1.5;}
+.my-notes:focus{outline:none;border-color:var(--accent);}
+.notes-hint{font-family:'Special Elite',monospace;font-size:.7rem;color:var(--text3);letter-spacing:.1em;margin-top:.35rem;}
+
+/* PEEK CARDS */
+.peek-cards{display:flex;gap:.55rem;justify-content:center;margin:.55rem 0;}
+
+/* REVEAL BOX */
+.reveal-box{background:var(--bg2);border:1.5px solid var(--accent);border-radius:6px;padding:.82rem 1rem;margin:.4rem 0;text-align:center;box-shadow:var(--shadow);}
+.reveal-party{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-top:.3rem;}
+.reveal-party.lib{color:var(--blue);}.reveal-party.fas{color:var(--red);}
+
+/* MODALS */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg);border:2px solid var(--border2);border-radius:10px;padding:1.5rem;width:min(420px,95vw);box-shadow:0 8px 32px rgba(0,0,0,.25);}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--text);margin-bottom:.75rem;}
+
+/* ROLE REVEAL */
+.role-reveal-modal{background:var(--bg);border-radius:12px;padding:2rem;width:min(420px,95vw);box-shadow:0 12px 40px rgba(0,0,0,.3);text-align:center;border:2px solid var(--border2);}
+.role-card{border-radius:12px;padding:1.5rem 2rem;margin:.8rem 0;border:2px solid;}
+.role-card.lib{background:var(--blue-bg);border-color:var(--blue);}
+.role-card.fas{background:var(--red-bg);border-color:var(--red);}
+.role-card.hit{background:var(--bg2);border-color:var(--accent);}
+.role-name{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-top:.4rem;}
+.role-card.lib .role-name{color:var(--blue);}
+.role-card.fas .role-name{color:var(--red);}
+.role-card.hit .role-name{color:var(--accent);}
+.role-desc{font-size:.9rem;margin-top:.4rem;line-height:1.5;}
+.role-card.lib .role-desc{color:var(--blue);}
+.role-card.fas .role-desc{color:var(--red);}
+.role-card.hit .role-desc{color:var(--accent);}
+.teammates-box{background:var(--bg2);border:2px solid var(--border);border-radius:8px;padding:1rem 1.2rem;margin-top:1rem;text-align:left;}
+.teammates-lbl{font-family:'Special Elite',monospace;font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem;}
+.teammate{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;font-size:1.15rem;}
+.pc-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.d-u{background:var(--border2);}.d-l{background:var(--blue);}.d-f{background:var(--red);}.d-h{background:var(--accent);}
+.teammate .pc-dot{width:14px;height:14px;}
+.teammate strong{font-size:1.15rem;}
+.teammate span{font-size:.8rem !important;}
+
+/* WIN */
+.win-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(6px);}
+.win-bg.open{display:flex;}
+.win-box{text-align:center;padding:2.2rem;border:2px solid var(--accent);border-radius:10px;background:var(--bg);max-width:380px;width:90vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.win-box h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:.4rem;}
+.win-box.lib h2{color:var(--blue);}
+.win-box.fas h2{color:var(--red);}
+.win-box p{color:var(--text2);margin-bottom:1.2rem;}
+
+/* TOASTS */
+#toasts{position:fixed;bottom:.9rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:.32rem;z-index:200;pointer-events:none;width:min(340px,90vw);}
+.toast{background:var(--bg);border:1.5px solid var(--border2);border-radius:5px;padding:.55rem 1rem;font-family:'Special Elite',monospace;font-size:.82rem;letter-spacing:.1em;text-align:center;animation:tIn .2s ease;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+@keyframes tIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.toast.err{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.toast.ok{border-color:var(--green);color:var(--green);background:var(--bg2);}
+.toast.warn{border-color:var(--accent);color:var(--accent);}
+
+/* MISC */
+.row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.muted{color:var(--text3);font-size:.95rem;}
+.theme-toggle{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:var(--bg2);border:1.5px solid var(--border2);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .2s;box-shadow:var(--shadow);padding:0;}
+.theme-toggle:hover{border-color:var(--accent);transform:translateY(-50%) scale(1.1);}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:300px;}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.3rem;padding:.3rem .2rem .3rem 0;}
+.chat-msgs::-webkit-scrollbar{width:4px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.chat-msg{padding:.4rem .6rem;border-radius:5px;font-size:1.1rem;background:var(--bg2);border:1px solid var(--border);animation:slideIn .15s ease;}
+.chat-msg .chat-name{font-family:'Special Elite',monospace;font-size:.82rem;color:var(--accent);letter-spacing:.05em;margin-bottom:.08rem;}
+.chat-msg .chat-text{word-break:break-word;line-height:1.5;font-size:1.1rem;}
+.chat-msg .chat-time{font-family:'Special Elite',monospace;font-size:.6rem;color:var(--text3);float:right;margin-left:.5rem;}
+.chat-msg.me{background:var(--bg2);border-color:var(--accent);}
+.chat-input-row{display:flex;gap:.35rem;margin-top:.4rem;}
+.chat-input{flex:1;background:var(--bg);border:1.5px solid var(--border2);border-radius:5px;color:var(--text);font-family:'Crimson Text',serif;font-size:1rem;padding:.4rem .65rem;}
+.chat-input:focus{outline:none;border-color:var(--accent);}
+.emote-btn{background:var(--bg2);border:1.5px solid var(--border2);border-radius:5px;cursor:pointer;font-size:1.1rem;padding:.3rem .5rem;transition:all .18s;line-height:1;}
+.emote-btn:hover{border-color:var(--accent);background:var(--bg3);}
+.emote-picker{display:none;position:absolute;bottom:100%;right:0;margin-bottom:.35rem;background:var(--bg);border:1.5px solid var(--accent);border-radius:8px;padding:.4rem;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:100;width:320px;max-height:300px;overflow-y:auto;}
+.emote-picker.open{display:flex;flex-direction:column;}
+.emote-search-row{padding:0 .1rem .2rem;flex-shrink:0;}
+.emote-import-row{display:flex;gap:.25rem;padding:0 .1rem .3rem;flex-shrink:0;}
+.emote-import-row input{flex:1;min-width:0;}
+#emote-grid{overflow-y:auto;flex:1;}
+.emote-search{width:100%;background:var(--bg2);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Crimson Text',serif;font-size:.85rem;padding:.3rem .5rem;}
+.emote-search:focus{outline:none;border-color:var(--accent);}
+.emote-pick{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:.25rem;border-radius:4px;transition:background .12s;line-height:1;display:inline-flex;align-items:center;justify-content:center;}
+.emote-pick:hover{background:var(--bg3);}
+.emote-pick.stv-pick{padding:.15rem;}
+.emote-pick.stv-pick img{width:28px;height:28px;object-fit:contain;}
+.emote-pick-cat{font-family:'Special Elite',monospace;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:.35rem .1rem .15rem;width:100%;}
+.stv-emote{height:1.4em;vertical-align:middle;display:inline;}
+
+/* CLAIMS */
+.claim-panel{background:var(--bg2);border:1.5px solid var(--accent);border-radius:8px;padding:1rem 1.1rem;margin-bottom:.75rem;box-shadow:var(--shadow);animation:fadeIn .25s ease;}
+.claim-title{font-family:'Special Elite',monospace;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;}
+.claim-combos{display:flex;gap:.45rem;flex-wrap:wrap;}
+.claim-combo{display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem;border-radius:6px;border:2px solid var(--border2);background:var(--bg);cursor:pointer;transition:all .18s;font-family:'Crimson Text',serif;font-size:.95rem;color:var(--text);}
+.claim-combo:hover{border-color:var(--accent);background:var(--bg2);}
+.claim-combo.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.08);background:var(--bg2);}
+.claim-combo.lib{border-color:var(--blue);}
+.claim-combo.fas{border-color:var(--red);}
+.claim-combo.mix{border-color:var(--border2);}
+.claim-combo-icons{display:flex;gap:.25rem;align-items:center;}
+.claim-card-img{width:28px;height:38px;border-radius:3px;object-fit:contain;}
+.claim-combo-label{font-family:'Special Elite',monospace;font-size:.68rem;letter-spacing:.06em;color:var(--text2);}
+.claim-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}
+.le-claim{border-left-color:var(--accent);background:var(--bg2);}
+
+/* GAME SETTINGS */
+.settings-card{margin-top:.8rem;}
+.settings-grid{display:flex;flex-direction:column;gap:.6rem;}
+.setting-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .65rem;background:var(--bg2);border:1px solid var(--border);border-radius:5px;}
+.setting-info{flex:1;min-width:0;}
+.setting-name{font-family:'Special Elite',monospace;font-size:.78rem;letter-spacing:.08em;color:var(--text);text-transform:uppercase;}
+.setting-desc{font-size:.82rem;color:var(--text3);margin-top:.1rem;}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .2s;}
+.toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle input:checked+.toggle-track{background:var(--green);}
+.toggle input:checked+.toggle-track::after{transform:translateX(18px);}
+.toggle input:disabled+.toggle-track{opacity:.4;cursor:not-allowed;}
+.timer-select{background:var(--bg);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Special Elite',monospace;font-size:.75rem;padding:.25rem .4rem;width:70px;}
+.timer-select:disabled{opacity:.4;}
+.setting-name-input{background:var(--bg);border:1.5px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Crimson Text',serif;font-size:1rem;padding:.35rem .6rem;width:100%;max-width:220px;}
+.setting-name-input:focus{outline:none;border-color:var(--accent);}
+.setting-name-input:disabled{opacity:.5;}
+
+/* GAME TIMER */
+.timer-bar{display:flex;align-items:center;gap:.4rem;font-family:'Special Elite',monospace;font-size:.78rem;color:var(--text3);padding:.3rem .6rem;background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:.5rem;}
+.timer-bar.urgent{color:var(--red);border-color:var(--red);background:var(--red-bg);}
+.timer-bar .timer-num{font-weight:700;font-size:.9rem;min-width:28px;text-align:center;}
+
+/* PROFILE / HISTORY */
+.profile-section{margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1.2rem;}
+.profile-stats{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:70px;text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:.6rem .4rem;}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;}
+.stat-lbl{font-family:'Special Elite',monospace;font-size:.65rem;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;margin-top:.2rem;}
+.stat-box.wins .stat-num{color:var(--green);}
+.stat-box.losses .stat-num{color:var(--red);}
+.history-list{display:flex;flex-direction:column;gap:.45rem;max-height:300px;overflow-y:auto;padding-right:3px;}
+.history-list::-webkit-scrollbar{width:4px;}
+.history-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.hist-item{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;background:var(--bg2);border:1.5px solid var(--border);border-radius:5px;font-size:.95rem;}
+.hist-item.win{border-left:4px solid var(--green);}
+.hist-item.loss{border-left:4px solid var(--red);}
+.hist-result{font-family:'Special Elite',monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;flex-shrink:0;width:38px;text-align:center;}
+.hist-item.win .hist-result{color:var(--green);}
+.hist-item.loss .hist-result{color:var(--red);}
+.hist-role{display:inline-flex;align-items:center;gap:.25rem;font-family:'Special Elite',monospace;font-size:.7rem;padding:.1rem .4rem;border-radius:20px;flex-shrink:0;}
+.hist-role.lib{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue);}
+.hist-role.fas{background:var(--red-bg);color:var(--red);border:1px solid var(--red);}
+.hist-role.hit{background:var(--bg2);color:var(--accent);border:1px solid var(--accent);}
+.hist-date{font-family:'Special Elite',monospace;font-size:.65rem;color:var(--text3);margin-left:auto;flex-shrink:0;}
+.hist-winner{font-size:.85rem;flex:1;min-width:0;}
+.hist-empty{text-align:center;color:var(--text3);font-style:italic;font-size:.95rem;padding:1rem;}
+.clear-hist{margin-top:.6rem;text-align:right;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOBBY ══ -->
+<div class="screen active" id="s-lobby">
+  <div class="hdr"><div class="title">SECRET HITLER</div><div class="subtitle">Live Multiplayer Tracker</div><button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button></div>
+  <div class="wrap">
+    <div class="conn-bar"><span class="cdot" id="cdot"></span><span id="clbl">Connecting…</span></div>
+    <label class="lbl">Your Name</label>
+    <div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.85rem;">
+      <input class="fi" id="l-name" placeholder="Enter your name…" maxlength="20" autocomplete="off" style="margin-bottom:0;flex:1;">
+      <input type="color" id="l-name-color" value="#d4a017" title="Name color" style="width:36px;height:36px;border:2px solid var(--border2);border-radius:5px;cursor:pointer;background:none;padding:0;">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="doCreate()">Create New Game</button>
+    <div class="divider">OR JOIN EXISTING</div>
+    <label class="lbl">Room Code</label>
+    <input class="fi" id="l-code" placeholder="ABCD" maxlength="6"
+      style="text-transform:uppercase;letter-spacing:.25em;font-family:'Special Elite',monospace;font-size:1.3rem;"
+      autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn btn-secondary btn-block" onclick="doJoin()">Join Game</button>
+
+    <!-- PROFILE & HISTORY -->
+    <div class="profile-section">
+      <div class="lbl">Your Stats</div>
+      <div class="profile-stats">
+        <div class="stat-box"><div class="stat-num" id="stat-games">0</div><div class="stat-lbl">Games</div></div>
+        <div class="stat-box wins"><div class="stat-num" id="stat-wins">0</div><div class="stat-lbl">Wins</div></div>
+        <div class="stat-box losses"><div class="stat-num" id="stat-losses">0</div><div class="stat-lbl">Losses</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-rate">—</div><div class="stat-lbl">Win %</div></div>
+      </div>
+      <div class="lbl">Game History</div>
+      <div class="history-list" id="history-list"></div>
+      <div class="clear-hist"><button class="btn btn-sm btn-danger" onclick="clearHistory()">Clear History</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WAITING ROOM ══ -->
+<div class="screen" id="s-waiting">
+  <div class="hdr" style="padding:.9rem 0 .7rem;"><div class="title" style="font-size:1.6rem;">SECRET HITLER</div><div class="subtitle">Waiting Room</div><button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button></div>
+  <div class="wr-wrap">
+    <div class="code-box">
+      <div class="code-hint">ROOM CODE — CLICK TO COPY</div>
+      <div class="big-code" id="wr-code" onclick="copyCode()">—</div>
+      <div class="code-hint" id="wr-cnt" style="margin-top:.28rem;">0 players</div>
+    </div>
+    <label class="lbl" id="lbl-cnt">Players</label>
+    <div class="count-row" id="wr-cnt-row"></div>
+    <label class="lbl">Joined</label>
+    <div class="slots" id="wr-slots"></div>
+    <label class="lbl" style="margin-top:.65rem;">Seat Order</label>
+    <div class="order-row" id="wr-order"></div>
+    <div class="row" style="margin-top:.8rem;gap:.4rem;">
+      <button class="btn btn-primary" id="wr-start" onclick="doStart()" disabled>Start Game</button>
+      <button class="btn btn-secondary btn-sm" id="wr-shuffle" onclick="send({type:'shuffle'})">🔀 Shuffle</button>
+      <button class="btn btn-secondary btn-sm" id="wr-add-bot" onclick="send({type:'addBot'})">🤖 Add Bot</button>
+      <span id="wr-status" class="muted"></span>
+    </div>
+    <!-- GAME SETTINGS -->
+    <div class="settings-card" style="margin-top:1rem;">
+      <div class="lbl">Game Settings <span style="color:var(--text3);font-size:.6rem;" id="settings-host-hint"></span></div>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Game Name</div>
+          </div>
+          <input class="setting-name-input" id="set-name" placeholder="Optional" maxlength="30" oninput="sendSetting('gameName',this.value)">
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Hitler Knows Fascists</div>
+            <div class="setting-desc">Hitler sees who the Fascists are at game start</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="set-hitler" onchange="sendSetting('hitlerKnowsFascists',this.checked)"><span class="toggle-track"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Rebalance</div>
+            <div class="setting-desc">Adds 1 extra Liberal card to the deck (7L/11F)</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="set-rebalance" onchange="sendSetting('rebalance',this.checked)"><span class="toggle-track"></span></label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Timed Mode</div>
+            <div class="setting-desc">Auto-random action if player doesn't act in time</div>
+          </div>
+          <select class="timer-select" id="set-timer-secs" onchange="sendSetting('timerSeconds',parseInt(this.value))">
+            <option value="30">30s</option>
+            <option value="60">60s</option>
+            <option value="90" selected>90s</option>
+            <option value="120">120s</option>
+            <option value="180">180s</option>
+            <option value="300">300s</option>
+          </select>
+          <label class="toggle"><input type="checkbox" id="set-timed" onchange="sendSetting('timedMode',this.checked)"><span class="toggle-track"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:.65rem;display:flex;gap:.5rem;align-items:center;">
+      <button class="btn btn-sm btn-danger" onclick="doLeave()">Leave</button>
+      <input type="color" id="wr-name-color" title="Name color" onchange="changeColor(this.value)" style="width:28px;height:28px;border:2px solid var(--border2);border-radius:5px;cursor:pointer;background:none;padding:0;">
+      <span style="font-family:'Special Elite',monospace;font-size:.6rem;color:var(--text3);">NAME COLOR</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div class="screen" id="s-game">
+  <div class="hdr" style="padding:.65rem 0 .55rem;">
+    <div class="title" style="font-size:1.45rem;">SECRET HITLER</div>
+    <div style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:.3rem;">
+      <input type="color" id="g-name-color" title="Name color" onchange="changeColor(this.value)" style="width:24px;height:24px;border:2px solid var(--border2);border-radius:4px;cursor:pointer;background:none;padding:0;">
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button>
+  </div>
+  <div class="g-wrap">
+    <div class="g-top">
+      <div class="live-badge"><div class="ldot"></div>LIVE</div>
+      <span style="font-family:'Special Elite',monospace;font-size:.78rem;color:var(--text3);"><span id="g-name" style="color:var(--accent);"></span> ROOM <span id="g-code" style="color:var(--red);font-weight:700;"></span></span>
+      <div style="margin-left:auto;" class="row">
+        <span style="font-family:'Special Elite',monospace;font-size:.78rem;color:var(--text3);" id="g-round">ROUND 1</span>
+        <button class="btn btn-sm btn-danger" onclick="doLeave()">Leave</button>
+      </div>
+    </div>
+
+    <div class="g-grid">
+      <!-- LEFT: Game Board -->
+      <div class="g-left">
+        <!-- Board: Piles | Mats -->
+        <div class="board-row">
+          <!-- Sidebar: piles + tracker -->
+          <div class="piles-col">
+            <div id="g-deck"></div>
+            <div class="sidebar-tracker" id="g-tracker">
+              <div class="sidebar-tracker-lbl">Elections</div>
+              <div class="mat-tracker-pips" id="g-elect"></div>
+              <div class="sidebar-tracker-arrow">↓</div>
+              <div class="mat-tracker-chaos">CHAOS</div>
+            </div>
+          </div>
+
+          <!-- Game Mats (with action overlay) -->
+          <div class="board-mats" id="mat-area" style="position:relative;">
+            <div class="mat mat-lib">
+              <div class="mat-header"><span class="mat-title">Liberal</span></div>
+              <div class="mat-slots" id="g-lib"></div>
+              <div class="mat-footer"><span class="mat-info" id="g-lib-count"></span></div>
+            </div>
+            <div class="mat mat-fas">
+              <div class="mat-header"><span class="mat-title">Fascist</span></div>
+              <div class="mat-slots" id="g-fas"></div>
+              <div class="mat-fas-warn" id="g-fas-warn"></div>
+              <div class="mat-footer"><span class="mat-info" id="g-fas-count"></span></div>
+            </div>
+            <!-- Overlay for votes, nominations, claims, powers -->
+            <div class="mat-overlay" id="mat-overlay"></div>
+          </div>
+        </div>
+
+        <!-- Status banner (non-blocking waiting messages) -->
+        <div class="mat-status" id="mat-status"></div>
+
+        <!-- Timer -->
+        <div id="timer-bar" class="timer-bar" style="display:none;">⏱ <span class="timer-num" id="timer-num">—</span> seconds remaining</div>
+
+        <!-- Players below mat -->
+        <div class="player-strip" id="g-players"></div>
+        <div class="pcard-legend">
+          <span>👑 President</span>
+          <span>🎯 Chancellor</span>
+          <span>🗳 Nominee</span>
+          <span>🟥 You</span>
+          <span>💀 Dead</span>
+        </div>
+      </div>
+
+      <!-- Resizable divider -->
+      <div class="g-divider" id="g-divider"></div>
+
+      <!-- RIGHT: Dockable panels -->
+      <div class="g-right" id="g-right">
+        <!-- Log panel -->
+        <div class="dock-panel expanded" id="dock-log" data-dock="log" draggable="true">
+          <div class="dock-header" data-dock-handle>
+            <span class="dock-title">Log</span>
+            <button class="dock-toggle" onclick="toggleDock('dock-log')">▼</button>
+          </div>
+          <div class="dock-body">
+            <div class="log-filter" id="log-filter" style="padding:.3rem .5rem;">
+              <button class="log-filter-btn active" onclick="setLogFilter('all',this)">All</button>
+              <button class="log-filter-btn" onclick="setLogFilter('claim',this)">Claims</button>
+              <button class="log-filter-btn" onclick="setLogFilter('elect',this)">Votes</button>
+              <button class="log-filter-btn" onclick="setLogFilter('chan',this)">Policies</button>
+              <button class="log-filter-btn" onclick="setLogFilter('kill',this)">Kills</button>
+            </div>
+            <div class="log-wrap" id="g-log" style="flex:1;"></div>
+          </div>
+        </div>
+
+        <!-- Chat panel -->
+        <div class="dock-panel expanded" id="dock-chat" data-dock="chat" draggable="true">
+          <div class="dock-header" data-dock-handle>
+            <span class="dock-title">Chat <span class="dock-badge" id="chat-badge">●</span></span>
+            <button class="dock-toggle" onclick="toggleDock('dock-chat')">▼</button>
+          </div>
+          <div class="dock-body">
+            <div class="chat-msgs" id="chat-msgs" style="flex:1;overflow-y:auto;padding:.3rem;"></div>
+            <div class="chat-input-row" style="position:relative;padding:.3rem .4rem;">
+              <input class="chat-input" id="chat-input" placeholder="Type a message…" maxlength="300">
+              <button class="emote-btn" id="emote-toggle" onclick="toggleEmotePicker(event)" title="Emotes">😀</button>
+              <button class="btn btn-sm btn-gold" onclick="sendChat()">Send</button>
+              <div class="emote-picker" id="emote-picker"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes panel -->
+        <div class="dock-panel collapsed" id="dock-notes" data-dock="notes" draggable="true">
+          <div class="dock-header" data-dock-handle>
+            <span class="dock-title">Notes</span>
+            <button class="dock-toggle" onclick="toggleDock('dock-notes')">▼</button>
+          </div>
+          <div class="dock-body">
+            <textarea class="my-notes" id="my-notes" placeholder="Your private notes…" style="flex:1;margin:.3rem;resize:none;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARD SELECTION MODAL -->
+<div class="card-modal-bg" id="card-modal-bg">
+  <div class="card-modal" id="card-modal"></div>
+</div>
+
+<!-- ROLE REVEAL MODAL -->
+<div class="modal-bg" id="role-reveal-modal">
+  <div class="role-reveal-modal">
+    <div style="font-family:'Special Elite',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--text3);margin-bottom:.2rem;">YOUR SECRET ROLE</div>
+    <div id="rrm-card"></div>
+    <div id="rrm-teammates"></div>
+    <button class="btn btn-primary btn-block" style="margin-top:1rem;" onclick="closeRoleReveal()">I understand — close</button>
+  </div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="win-bg" id="win-bg">
+  <div class="win-box" id="win-box">
+    <div style="font-size:2.4rem;margin-bottom:.4rem;" id="win-icon">🎉</div>
+    <h2 id="win-title">Game Over</h2><p id="win-msg"></p>
+    <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="win-again" onclick="send({type:'playAgain'})" style="display:none;">Play Again</button>
+      <button class="btn btn-secondary" onclick="doLeave()">Leave Game</button>
+    </div>
+  </div>
+</div>
+<div id="toasts"></div>
+
+<!-- Special video popup -->
+<div id="video-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(8px);animation:fadeIn .3s ease;">
+  <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--accent);margin-bottom:1rem;text-align:center;letter-spacing:.1em;">A LEGEND HAS ARRIVED TO TAKE US TO THE MOON</div>
+  <div id="video-container" style="width:min(640px,90vw);aspect-ratio:16/9;border-radius:10px;overflow:hidden;box-shadow:0 0 40px rgba(184,134,11,.4);border:3px solid var(--accent);"></div>
+  <button class="btn btn-secondary" style="margin-top:1rem;" onclick="closeVideoPopup()">Close</button>
+</div>
+
+<script>
+// ─── WS ────────────────────────────────────────────────────
+const WS_URL = location.protocol==='https:' ? `wss://${location.host}` : `ws://${location.host}`;
+let ws=null, reconnDelay=1000;
+let myId=null, myRoom=null, currentScreen='s-lobby';
+let myPeekCards=null, myInvestResult=null, myRole=null, lastSavedGame=null;
+
+function connect(){
+  ws=new WebSocket(WS_URL);
+  ws.onopen=()=>{ reconnDelay=1000; setConn(true); const s=getSess(); if(s&&currentScreen!=='s-lobby') send({type:'rejoin',playerId:s.id,code:s.code}); };
+  ws.onmessage=e=>{ try{ handle(JSON.parse(e.data)); }catch(ex){ console.error(ex); } };
+  ws.onclose=()=>{ setConn(false); setTimeout(()=>{ reconnDelay=Math.min(reconnDelay*1.5,8000); connect(); },reconnDelay); };
+  ws.onerror=()=>ws.close();
+}
+function send(msg){ if(ws?.readyState===1) ws.send(JSON.stringify(msg)); }
+function setConn(ok){ document.getElementById('cdot').classList.toggle('ok',ok); document.getElementById('clbl').textContent=ok?'Connected':'Reconnecting…'; }
+function getSess(){ try{return JSON.parse(sessionStorage.getItem('sh'));}catch{return null;} }
+function saveSess(id,code){ sessionStorage.setItem('sh',JSON.stringify({id,code})); }
+function clearSess(){ sessionStorage.removeItem('sh'); }
+
+// ─── MESSAGES ──────────────────────────────────────────────
+function handle(msg){
+  switch(msg.type){
+    case 'joined':
+      myId=msg.playerId; myRoom=msg.room; saveSess(myId,myRoom.code);
+      const myColor=localStorage.getItem('sh-name-color');
+      if(myColor) send({type:'setNameColor',color:myColor});
+      if(myRoom.phase==='active'){ showScreen('s-game'); renderGame(); }
+      else{ showScreen('s-waiting'); initWaiting(); renderWaiting(); }
+      break;
+    case 'state':
+      myRoom=msg.room;
+      if(currentScreen==='s-waiting'){ renderWaiting(); if(myRoom.phase==='active'){ showScreen('s-game'); renderGame(); } }
+      else if(currentScreen==='s-game'){
+        if(myRoom.phase==='waiting'){
+          document.getElementById('win-bg').classList.remove('open');
+          closeCardModal(); pendingClaim=null; selectedClaim=null; chatMessages=[];
+          showScreen('s-waiting'); initWaiting(); renderWaiting();
+        } else {
+          renderGame(); if(myRoom.phase==='ended'){ closeCardModal(); showWin(); }
+        }
+      }
+      break;
+    case 'left': clearSess(); myId=null; myRoom=null; myRole=null; lastSavedGame=null; showScreen('s-lobby'); break;
+    case 'error': toast(msg.text,'err'); break;
+    case 'roleReveal': myRole=msg.role; showRoleReveal(msg); break;
+    case 'peek': myPeekCards=msg.cards; renderPhasePanel(); break;
+    case 'investigate': myInvestResult={targetName:msg.targetName,party:msg.party}; renderPhasePanel(); break;
+    case 'chat': appendChat(msg); break;
+    case '7tv': if(msg.emotes) msg.emotes.forEach(e=>{ if(e.id&&e.name&&!seventvEmotes[e.name]){ seventvEmotes[e.name]={url:`https://cdn.7tv.app/emote/${e.id}/1x.webp`,url2x:`https://cdn.7tv.app/emote/${e.id}/2x.webp`,id:e.id,name:e.name}; }}); break;
+    case 'specialEvent': handleSpecialEvent(msg.event); break;
+  }
+}
+
+// ─── LOBBY ──────────────────────────────────────────────────
+function rememberName(n){ localStorage.setItem('sh-name',n); customStvSets=JSON.parse(localStorage.getItem(getStvKey())||'[]'); }
+function doCreate(){ const n=document.getElementById('l-name').value.trim(); if(!n){toast('Enter your name','err');return;} rememberName(n); send({type:'create',name:n}); }
+function doJoin(){ const n=document.getElementById('l-name').value.trim(),c=document.getElementById('l-code').value.trim().toUpperCase(); if(!n){toast('Enter your name','err');return;} if(!c){toast('Enter a room code','err');return;} rememberName(n); send({type:'join',name:n,code:c}); }
+function doLeave(){ send({type:'leave'}); clearSess(); myRole=null; lastSavedGame=null; pendingClaim=null; selectedClaim=null; chatMessages=[]; showScreen('s-lobby'); document.getElementById('win-bg').classList.remove('open'); closeCardModal(); }
+function copyCode(){ navigator.clipboard.writeText(myRoom?.code||'').then(()=>toast('Code copied!','ok')).catch(()=>toast(myRoom?.code||'')); }
+
+// ─── WAITING ROOM ────────────────────────────────────────────
+function initWaiting(){
+  const isH=myRoom.hostId===myId;
+  document.getElementById('wr-code').textContent=myRoom.code;
+  const row=document.getElementById('wr-cnt-row');
+  row.innerHTML=[5,6,7,8,9,10].map(n=>`<button class="cnt-btn${n===myRoom.numPlayers?' active':''}" data-n="${n}"
+    onclick="send({type:'setCount',n:${n}})" ${isH?'':'disabled'}>${n}</button>`).join('');
+  document.getElementById('wr-shuffle').style.display=isH?'':'none';
+  document.getElementById('wr-start').style.display=isH?'':'none';
+  document.getElementById('wr-add-bot').style.display=isH?'':'none';
+  document.getElementById('settings-host-hint').textContent=isH?'(you are host)':'(host only)';
+  document.getElementById('set-name').disabled=!isH;
+  document.getElementById('set-hitler').disabled=!isH;
+  document.getElementById('set-rebalance').disabled=!isH;
+  document.getElementById('set-timed').disabled=!isH;
+  document.getElementById('set-timer-secs').disabled=!isH;
+  syncSettings();
+}
+
+function renderWaiting(){
+  const r=myRoom, isH=r.hostId===myId;
+  document.getElementById('wr-cnt').textContent=`${r.players.length} / ${r.numPlayers} players`;
+  document.querySelectorAll('.cnt-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.n)===r.numPlayers));
+  const sDiv=document.getElementById('wr-slots'); sDiv.innerHTML='';
+  for(let i=0;i<r.numPlayers;i++){
+    const p=r.players[i]; const isMe=p?.id===myId; const isH2=p?.id===r.hostId; const dc=p&&!p.connected;
+    const isBot=p&&p.isBot;
+    const d=document.createElement('div'); d.className='slot'+(p?' filled':'')+(isMe?' is-me':'');
+    const pnc=p?.nameColor?` style="color:${p.nameColor}"`:'';
+    d.innerHTML=`<span class="slot-n">${i+1}</span><span class="slot-name"${pnc}>${p?p.name:'<span class="slot-empty">Waiting…</span>'}</span>${isMe?'<span class="tag tag-you">YOU</span>':''}${p&&isH2&&!isMe?'<span class="tag tag-host">HOST</span>':''}${isBot?'<span class="tag" style="color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue);">BOT</span>':''}${dc&&!isBot?'<span class="tag tag-dc">AWAY</span>':''}${isBot&&isH?'<button class="btn btn-sm btn-danger" style="padding:.15rem .4rem;font-size:.6rem;margin-left:auto;" onclick="send({type:\'removeBot\',botId:\''+p.id+'\'})">✕</button>':''}`;
+    sDiv.appendChild(d);
+  }
+  const oDiv=document.getElementById('wr-order'); oDiv.innerHTML='';
+  r.players.forEach((p,i)=>{ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`<div class="chip-n">${i+1}</div><span>${p.name}</span>`; oDiv.appendChild(c); });
+  if(isH){ const rdy=r.players.length>=r.numPlayers; document.getElementById('wr-start').disabled=!rdy; document.getElementById('wr-add-bot').disabled=rdy; document.getElementById('wr-status').textContent=rdy?'All players ready!':'Waiting for more players…'; }
+  else document.getElementById('wr-status').textContent='Waiting for host to start…';
+  syncSettings();
+}
+
+function doStart(){ send({type:'start'}); }
+
+function syncSettings(){
+  if(!myRoom?.settings) return;
+  const s=myRoom.settings;
+  document.getElementById('set-name').value=s.gameName||'';
+  document.getElementById('set-hitler').checked=s.hitlerKnowsFascists;
+  document.getElementById('set-rebalance').checked=s.rebalance;
+  document.getElementById('set-timed').checked=s.timedMode;
+  document.getElementById('set-timer-secs').value=s.timerSeconds||90;
+}
+
+let settingsDebounce=null;
+function sendSetting(key,val){
+  if(myRoom?.hostId!==myId) return;
+  clearTimeout(settingsDebounce);
+  settingsDebounce=setTimeout(()=>{ const msg={type:'setSettings'}; msg[key]=val; send(msg); },150);
+}
+
+// ─── ROLE REVEAL ─────────────────────────────────────────────
+function showRoleReveal(msg){
+  const {role, teammates} = msg;
+  const icons={liberal:'🕊',fascist:'🔴',hitler:'⚡'};
+  const names={liberal:'Liberal',fascist:'Fascist',hitler:'Hitler'};
+  const descs={
+    liberal:'You are a Liberal. Work to enact 5 Liberal policies or find and execute Hitler.',
+    fascist:'You are a Fascist. Help enact 6 Fascist policies or get Hitler elected Chancellor.',
+    hitler:'You are Hitler. Play innocent! Win by being elected Chancellor after 3 Fascist policies.',
+  };
+  const cls={liberal:'lib',fascist:'fas',hitler:'hit'}[role];
+  document.getElementById('rrm-card').innerHTML=`
+    <div class="role-card ${cls}">
+      <div style="font-size:2.5rem;">${icons[role]||'?'}</div>
+      <div class="role-name">${names[role]||role}</div>
+      <div class="role-desc">${descs[role]||''}</div>
+    </div>`;
+  let tmHtml='';
+  if(teammates&&teammates.length>0){
+    tmHtml=`<div class="teammates-box">
+      <div class="teammates-lbl">${role==='hitler'?'Your Fascist (they know you):':'Your team:'}</div>
+      ${teammates.map(t=>`<div class="teammate">
+        <div class="pc-dot ${t.role==='hitler'?'d-h':'d-f'}"></div>
+        <strong>${t.name}</strong>
+        <span style="font-family:'Special Elite',monospace;font-size:.6rem;color:var(--text3);">(${t.role})</span>
+      </div>`).join('')}
+    </div>`;
+  } else if(role==='liberal'){
+    tmHtml=`<div class="teammates-box"><div class="teammates-lbl">Intel</div><div style="font-size:1.05rem;color:var(--text2);line-height:1.5;">You don't know who anyone else is. Trust no one.</div></div>`;
+  } else if(role==='hitler'){
+    tmHtml=`<div class="teammates-box"><div class="teammates-lbl">Intel</div><div style="font-size:1.05rem;color:var(--text2);line-height:1.5;">You don't know who the Fascists are. They know you.</div></div>`;
+  }
+  document.getElementById('rrm-teammates').innerHTML=tmHtml;
+  document.getElementById('role-reveal-modal').classList.add('open');
+}
+function closeRoleReveal(){ document.getElementById('role-reveal-modal').classList.remove('open'); }
+
+// ─── GAME RENDER ─────────────────────────────────────────────
+function renderGame(){
+  const r=myRoom;
+  document.getElementById('g-code').textContent=r.code;
+  document.getElementById('g-name').textContent=r.settings?.gameName?r.settings.gameName+' · ':'';
+  document.getElementById('g-round').textContent=`ROUND ${r.round}`;
+  renderPlayers(); renderTracks(); renderElect(); renderPhasePanel(); renderClaimPanel(); renderLog(); loadNotes(); updateTimer();
+}
+
+let timerInterval=null;
+function updateTimer(){
+  const r=myRoom;
+  const bar=document.getElementById('timer-bar');
+  const num=document.getElementById('timer-num');
+  if(!r||!r.timerDeadline||r.phase!=='active'){
+    bar.style.display='none';
+    if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+    return;
+  }
+  bar.style.display='flex';
+  function tick(){
+    const left=Math.max(0,Math.ceil((r.timerDeadline-Date.now())/1000));
+    num.textContent=left;
+    bar.classList.toggle('urgent',left<=10);
+    if(left<=0&&timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  }
+  tick();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(tick,500);
+}
+
+function amPres(){ return myRoom?.players[myRoom.presIdx]?.id===myId; }
+function amChan(){ return myRoom?.chanIdx!=null&&myRoom.players[myRoom.chanIdx]?.id===myId; }
+
+function renderPlayers(){
+  const r=myRoom, div=document.getElementById('g-players'); div.innerHTML='';
+  const roleIcons={unknown:'?',liberal:'🕊',fascist:'🦎',hitler:'🐍'};
+  r.players.forEach((p,idx)=>{
+    const iM=p.id===myId, iP=idx===r.presIdx, iC=r.chanIdx!=null&&idx===r.chanIdx;
+    const iN=r.nomineeIdx!=null&&idx===r.nomineeIdx&&r.roundPhase==='vote';
+    const el=document.createElement('div');
+    el.className='pcard'+(p.dead?' dead':'')+(iP?' is-pres':'')+(iC?' is-chan':'');
+    const artCls='pcard-art role-'+p.role;
+    let tag='';
+    if(p.dead) tag='<span class="pcard-tag tag-dead">💀</span>';
+    else if(iM) tag='<span class="pcard-tag tag-you">🟥</span>';
+    else if(iP) tag='<span class="pcard-tag tag-pres">👑</span>';
+    else if(iC) tag='<span class="pcard-tag tag-chan">🎯</span>';
+    else if(iN) tag='<span class="pcard-tag tag-nom">🗳</span>';
+    const isKnown=p.role!=='unknown';
+    const icon=isKnown?`<div class="role-icon">${roleIcons[p.role]}</div>`:'<div class="role-q">?</div>';
+    const lbl=isKnown?`<div class="role-lbl">${p.role}</div>`:'<div class="role-lbl">unknown</div>';
+    const nc=p.nameColor?` style="color:${p.nameColor}"`:'';
+    el.innerHTML=`<div class="${artCls}">${tag}${icon}${lbl}</div><div class="pcard-name"${nc}>${p.name}</div>${iP?'<div class="pcard-sub">President</div>':iC?'<div class="pcard-sub">Chancellor</div>':''}`;
+    div.appendChild(el);
+  });
+}
+
+function renderTracks(){
+  const r=myRoom;
+  const n=r.players.length; let pwrs;
+  if(n<=6) pwrs=['','','peek','kill','kill',''];
+  else if(n<=8) pwrs=['','invest','elect','kill','kill',''];
+  else pwrs=['invest','invest','elect','kill','kill',''];
+  const pwrIcons={peek:'🔮',invest:'🔍',elect:'🗳️',kill:'🗡️'};
+  const pwrLabels={peek:'Peek',invest:'Investigate',elect:'Elect',kill:'Execute'};
+
+  // Liberal mat
+  const ln=document.getElementById('g-lib'); ln.innerHTML='';
+  for(let i=0;i<5;i++){
+    const filled=i<r.libPolicies;
+    const s=document.createElement('div');
+    s.className='mat-slot'+(filled?' filled':'');
+    if(filled) s.innerHTML=`<img class="slot-card" src="${CARD_IMG.L}" alt="Liberal">`;
+    else s.innerHTML='<div class="slot-empty">•</div>';
+    ln.appendChild(s);
+  }
+  document.getElementById('g-lib-count').textContent=`${r.libPolicies} / 5`;
+
+  // Fascist mat
+  const fn=document.getElementById('g-fas'); fn.innerHTML='';
+  for(let i=0;i<6;i++){
+    const filled=i<r.fasPolicies;
+    const pwr=pwrs[i];
+    const s=document.createElement('div');
+    s.className='mat-slot'+(filled?' filled':'');
+    if(filled) s.innerHTML=`<img class="slot-card" src="${CARD_IMG.F}" alt="Fascist">`;
+    else s.innerHTML='<div class="slot-empty">•</div>';
+    if(pwr && !filled) s.innerHTML+=`<div class="slot-pwr">${pwrIcons[pwr]} ${pwrLabels[pwr]}</div>`;
+    fn.appendChild(s);
+  }
+  document.getElementById('g-fas-count').textContent=`${r.fasPolicies} / 6`;
+
+  // Fascist win warning
+  const warn=document.getElementById('g-fas-warn');
+  if(r.fasPolicies>=3) warn.textContent='⚠ FASCISTS WIN IF HITLER IS ELECTED CHANCELLOR';
+  else warn.textContent='';
+
+  // Card piles
+  const deckF=Math.max(0,11-r.fasPolicies), deckL=Math.max(0,(r.settings?.rebalance?7:6)-r.libPolicies);
+  const drawTotal=deckF+deckL;
+  const discardTotal=17-drawTotal-r.libPolicies-r.fasPolicies;
+  const deck=document.getElementById('g-deck');
+  deck.innerHTML=`
+    <div class="pile">
+      <div class="pile-cards">
+        ${drawTotal>0?'<div class="pile-card"></div>':''}
+        ${drawTotal>2?'<div class="pile-card"></div>':''}
+        <div class="pile-card"><div class="pile-icon">📄</div><div class="pile-lbl">DRAW</div></div>
+      </div>
+      <div class="pile-count">${drawTotal}</div>
+      <div class="pile-sub">${deckF}⚡ ${deckL}🕊</div>
+    </div>
+    <div class="pile">
+      <div class="pile-cards">
+        ${discardTotal>0?'<div class="pile-card"></div>':''}
+        ${discardTotal>2?'<div class="pile-card"></div>':''}
+        <div class="pile-card"><div class="pile-icon">🗑</div><div class="pile-lbl">DISCARD</div></div>
+      </div>
+      <div class="pile-count">${Math.max(0,discardTotal)}</div>
+      <div class="pile-sub">discarded</div>
+    </div>`;
+}
+
+function renderElect(){
+  const r=myRoom, div=document.getElementById('g-elect'); div.innerHTML='';
+  for(let i=0;i<3;i++){
+    const on=i<r.electionFails;
+    const p=document.createElement('div');
+    p.className='mat-pip'+(on?' on':'');
+    p.textContent=on?'✗':'';
+    div.appendChild(p);
+  }
+}
+
+// ─── CARD IMAGES ─────────────────────────────────────────────
+const CARD_IMG = { L: 'card-liberal.svg', F: 'card-fascist.svg' };
+
+// ─── CARD MODAL ──────────────────────────────────────────────
+function openCardModal(html){ document.getElementById('card-modal').innerHTML=html; document.getElementById('card-modal-bg').classList.add('open'); }
+function closeCardModal(){ document.getElementById('card-modal-bg').classList.remove('open'); }
+
+function renderCardHtml(cards, action, actionLabel, extraHtml){
+  return `<div class="cards-row">${cards.map((c,i)=>`
+    <div class="policy-card" onclick="${action}(${i})">
+      <img src="${CARD_IMG[c]}" alt="${c==='L'?'Liberal':'Fascist'}">
+      <div class="discard-hint">${actionLabel}</div>
+    </div>`).join('')}
+  </div>${extraHtml||''}`;
+}
+
+// ─── PHASE PANEL ─────────────────────────────────────────────
+let lastCardPhase=null;
+function renderPhasePanel(){
+  const r=myRoom;
+  if(!r||r.phase!=='active'){ renderMatOverlay('',null,false); closeCardModal(); lastCardPhase=null; return; }
+  const rp=r.roundPhase;
+  let html='', mine=false;
+  let needCardModal=false, cardHtml='';
+
+  if(rp==='nominate'){
+    if(amPres()){
+      mine=true;
+      const alive=r.players.map((p,i)=>({p,i})).filter(({p,i})=>!p.dead&&i!==r.presIdx);
+      const blocked=new Set(); if(r.players.length>5) blocked.add(r.lastElegiblePres); blocked.add(r.lastElegibleChan);
+      html=`<div class="phase-title">👑 Pick a Chancellor</div>
+        <div class="phase-desc">Tap a player card to nominate them.</div>
+        <div class="pick-strip">${alive.map(({p,i})=>{
+          const bl=blocked.has(i);
+          const roleIcons={unknown:'?',liberal:'🕊',fascist:'🦎',hitler:'🐍'};
+          const isKnown=p.role!=='unknown';
+          const icon=isKnown?roleIcons[p.role]:'?';
+          const artCls='pcard-art role-'+p.role;
+          return `<button class="pick-card${bl?' disabled':''}" onclick="${bl?'':'send({type:\'nominate\',nomineeIdx:'+i+'})'}" ${bl?'disabled':''}>
+            <div class="${artCls}">
+              ${isKnown?'<div class="role-icon">'+icon+'</div>':'<div class="role-q">?</div>'}
+              <div class="role-lbl">${isKnown?p.role:'unknown'}</div>
+            </div>
+            <div class="pick-name">${p.name}</div>
+            ${bl?'<div class="pick-blocked">TERM LIMITED</div>':''}
+          </button>`;
+        }).join('')}</div>`;
+    } else {
+      html=`<div class="phase-title">🗳 Waiting for <strong>${r.players[r.presIdx].name}</strong> to nominate…</div>
+        <div class="phase-desc">The President is choosing a Chancellor candidate.</div>`;
+    }
+  }
+
+  else if(rp==='vote'){
+    // Vote renders into overlay, not phase panel
+  }
+
+  else if(rp==='presCards'){
+    if(amPres()&&r.drawnCards){
+      mine=true;
+      html=`<div class="phase-title">🎩 You drew 3 cards — pick one to discard</div>
+        <div class="phase-desc">A popup is showing your cards. Only you can see them.</div>`;
+      needCardModal=true;
+      cardHtml=`<div class="phase-title">🎩 President — Discard One Card</div>
+        <div class="phase-desc">Tap the card you want to <strong>discard</strong>. The other 2 go to the Chancellor.</div>
+        ${renderCardHtml(r.drawnCards,'doPresDiscard','tap to discard')}`;
+    } else {
+      html=`<div class="phase-title">🎩 <strong>${r.players[r.presIdx].name}</strong> is picking cards…</div>
+        <div class="phase-desc">President drew 3 cards privately and is discarding 1 before passing 2 to Chancellor.</div>`;
+    }
+  }
+
+  else if(rp==='chanCards'){
+    if(amChan()&&r.passedCardsPrivate){
+      mine=true;
+      html=`<div class="phase-title">📜 You received 2 cards — pick one to enact</div>
+        <div class="phase-desc">A popup is showing your cards. Only you can see them.</div>`;
+      needCardModal=true;
+      const vetoBtn=r.fasPolicies>=5?`<div style="margin-top:.8rem;"><button class="btn btn-secondary btn-sm" onclick="send({type:'proposeVeto'});closeCardModal();">Propose Veto</button></div>`:'';
+      cardHtml=`<div class="phase-title">📜 Chancellor — Enact One Policy</div>
+        <div class="phase-desc">Tap the card you want to <strong>enact</strong>.${r.fasPolicies>=5?' <em>You may also propose a Veto.</em>':''}</div>
+        ${renderCardHtml(r.passedCardsPrivate,'doChanEnact','tap to enact',vetoBtn)}`;
+    } else {
+      html=`<div class="phase-title">📜 <strong>${r.chanIdx!=null?r.players[r.chanIdx].name:'Chancellor'}</strong> is choosing a policy…</div>
+        <div class="phase-desc">Chancellor received 2 cards and is deciding which to enact.</div>`;
+    }
+  }
+
+  else if(rp==='veto'){
+    if(amPres()){
+      mine=true;
+      html=`<div class="phase-title">✋ Veto Proposed</div>
+        <div class="phase-desc">Chancellor wants to veto — both cards discarded. Agree? This advances the failed election tracker.</div>
+        <div class="phase-action">
+          <button class="btn btn-lib" onclick="send({type:'vetoResponse',accept:true})">Accept Veto</button>
+          <button class="btn btn-fas" onclick="send({type:'vetoResponse',accept:false})">Reject — Chancellor must enact</button>
+        </div>`;
+    } else {
+      html=`<div class="phase-title">✋ Veto Proposed</div>
+        <div class="phase-desc">${r.players[r.chanIdx]?.name} proposed a veto. Waiting for ${r.players[r.presIdx].name} to decide.</div>`;
+    }
+  }
+
+  else if(rp==='power'){
+    const pn={peek:'Policy Peek',investigate:'Investigate Loyalty',elect:'Special Election',execute:'Execution'}[r.activePower]||r.activePower;
+    if(amPres()){
+      mine=true;
+      if(r.activePower==='peek'){
+        if(myPeekCards){
+          needCardModal=true;
+          html=`<div class="phase-title">🔮 You are peeking at the top 3 cards</div><div class="phase-desc">Only you can see these.</div>`;
+          cardHtml=`<div class="phase-title">🔮 Policy Peek — Top 3 Cards</div>
+            <div class="phase-desc">Only you can see these. Remember them!</div>
+            <div class="cards-row">${myPeekCards.map(c=>`
+              <div class="policy-card" style="cursor:default;">
+                <img src="${CARD_IMG[c]}" alt="${c==='L'?'Liberal':'Fascist'}">
+              </div>`).join('')}
+            </div>
+            <button class="btn btn-primary" style="margin-top:.8rem;" onclick="myPeekCards=null;closeCardModal();send({type:'powerDone'})">Done — start next round</button>`;
+        } else {
+          html=`<div class="phase-title">⚡ Executive Power: ${pn}</div>
+            <div class="phase-desc">Secretly look at the top 3 policy cards in the deck.</div>
+            <div class="phase-action"><button class="btn btn-gold" onclick="send({type:'usePower',targetIdx:0})">Peek at cards</button></div>`;
+        }
+      } else {
+        const descs={investigate:'Choose a player to investigate. Only you will see their party membership.',elect:'Choose any player to be the next Presidential Candidate.',execute:'Choose a player to execute. If Hitler is executed, Liberals win immediately.'};
+        const alive=r.players.map((p,i)=>({p,i})).filter(({p,i})=>!p.dead);
+        if(myInvestResult&&r.activePower==='investigate'){
+          needCardModal=true;
+          html=`<div class="phase-title">🔍 You investigated a player</div><div class="phase-desc">Only you can see the result.</div>`;
+          cardHtml=`<div class="phase-title">🔍 Investigation Result</div>
+            <div class="reveal-box">
+              <div style="font-size:.75rem;color:var(--text3);">${myInvestResult.targetName}'s party:</div>
+              <div class="reveal-party ${myInvestResult.party==='LIBERAL'?'lib':'fas'}">${myInvestResult.party}</div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:.8rem;" onclick="myInvestResult=null;closeCardModal();send({type:'powerDone'})">Done — start next round</button>`;
+        } else {
+          html=`<div class="phase-title">⚡ ${pn}</div>
+            <div class="phase-desc">${descs[r.activePower]||''}</div>
+            <div class="pick-strip">${alive.filter(({i})=>i!==r.presIdx).map(({p,i})=>{
+              const roleIcons={unknown:'?',liberal:'🕊',fascist:'🦎',hitler:'🐍'};
+              const isKnown=p.role!=='unknown';
+              const icon=isKnown?roleIcons[p.role]:'?';
+              const artCls='pcard-art role-'+p.role;
+              return `<button class="pick-card" onclick="send({type:'usePower',targetIdx:${i}})">
+                <div class="${artCls}">
+                  ${isKnown?'<div class="role-icon">'+icon+'</div>':'<div class="role-q">?</div>'}
+                  <div class="role-lbl">${isKnown?p.role:'unknown'}</div>
+                </div>
+                <div class="pick-name">${p.name}</div>
+              </button>`;
+            }).join('')}</div>`;
+        }
+      }
+    } else {
+      html=`<div class="phase-title">⚡ Executive Power: ${pn}</div>
+        <div class="phase-desc"><strong>${r.players[r.presIdx].name}</strong> is using the ${pn.toLowerCase()} power.</div>`;
+    }
+  }
+
+  const phaseKey=rp+(needCardModal?':cards':'');
+  if(needCardModal){ openCardModal(cardHtml); }
+  else if(lastCardPhase&&lastCardPhase.endsWith(':cards')){ closeCardModal(); }
+  lastCardPhase=phaseKey;
+
+  renderMatOverlay(html, rp, mine);
+}
+
+function renderMatOverlay(phaseHtml, rp, mine){
+  const r=myRoom;
+  const overlay=document.getElementById('mat-overlay');
+  const status=document.getElementById('mat-status');
+  if(!overlay||!status) return;
+
+  let content='';
+  let waitingHtml='';
+
+  // Vote overlay (always overlay — everyone participates)
+  if(rp==='vote'){
+    const nominee=r.players[r.nomineeIdx], pres=r.players[r.presIdx];
+    const myPlayer=r.players.find(p=>p.id===myId);
+    const myVote=r.votes[myId], alive=r.players.filter(p=>!p.dead);
+    const votedCount=alive.filter(p=>r.votes[p.id]!==undefined).length;
+    content=`<div class="phase-title">🗳 ${pres.name} → ${nominee?.name}</div>`;
+    if(!r.voteRevealed){
+      if(!myPlayer?.dead){
+        if(!myVote){
+          content+=`<div class="phase-desc">Support this government?</div>
+            <div class="vote-btns"><button class="vbtn" onclick="doVote('ja')">✓ JA</button><button class="vbtn" onclick="doVote('nein')">✗ NEIN</button></div>`;
+        } else {
+          content+=`<div class="phase-desc">You voted <strong style="color:#fff;">${myVote.toUpperCase()}</strong>. Waiting…</div>`;
+        }
+      }
+      content+=`<div class="vote-grid">${alive.map(p=>{ const v=r.votes[p.id]; return `<div class="vote-chip ${v||'waiting'}">${p.name}: ${v?v.toUpperCase():'?'}</div>`; }).join('')}</div>`;
+      content+=`<div style="color:rgba(255,255,255,.4);font-size:.72rem;margin-top:.15rem;">${votedCount}/${alive.length}</div>`;
+    } else {
+      const jas=alive.filter(p=>r.votes[p.id]==='ja').length, neins=alive.length-jas, passed=jas>neins;
+      content+=`<div class="vote-result-box ${passed?'ja':'nein'}"><div class="vr-label">${passed?'✓ JA — PASSED':'✗ NEIN — FAILED'}</div><div class="vr-tally">${jas} Ja · ${neins} Nein</div></div>`;
+      content+=`<div class="vote-grid">${alive.map(p=>{ const v=r.votes[p.id]||'?'; return `<div class="vote-chip ${v}">${p.name}: ${v.toUpperCase()}</div>`; }).join('')}</div>`;
+    }
+  }
+  // Other phases — only overlay if it's YOUR action
+  else if(phaseHtml && mine){
+    content=phaseHtml;
+  }
+  // Waiting messages go to the status banner, not the overlay
+  else if(phaseHtml && !mine){
+    waitingHtml=phaseHtml;
+  }
+
+  // Append claim panel to overlay if pending
+  if(pendingClaim){
+    content+=renderClaimHtml();
+  }
+
+  // Show overlay for actions, hide for waiting
+  if(content){
+    overlay.innerHTML=content;
+    overlay.classList.add('open');
+  } else {
+    overlay.classList.remove('open');
+    overlay.innerHTML='';
+  }
+
+  // Show status banner for waiting messages
+  if(waitingHtml){
+    status.innerHTML=waitingHtml;
+    status.classList.add('open');
+  } else {
+    status.classList.remove('open');
+    status.innerHTML='';
+  }
+}
+
+// ─── PHASE ACTIONS ───────────────────────────────────────────
+function doVote(v){ send({type:'vote',v}); }
+let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null;
+function doPresDiscard(idx){
+  presCardsReceived=myRoom.drawnCards?[...myRoom.drawnCards]:null;
+  closeCardModal();
+  send({type:'presDiscard',discardIdx:idx});
+  pendingClaim='president';
+}
+function doChanEnact(idx){
+  chanCardsReceived=myRoom.passedCardsPrivate?[...myRoom.passedCardsPrivate]:null;
+  closeCardModal();
+  send({type:'chanEnact',enactIdx:idx});
+  pendingClaim='chancellor';
+}
+
+// ─── CLAIMS ──────────────────────────────────────────────────
+let selectedClaim=null;
+
+function claimCardImgs(cards){
+  return cards.map(c=>`<img src="${CARD_IMG[c]}" class="claim-card-img" alt="${c==='L'?'Liberal':'Fascist'}">`).join('');
+}
+function renderClaimHtml(){
+  if(!pendingClaim) return '';
+  const isPres=pendingClaim==='president';
+  const label=isPres?'President: What did you draw?':'Chancellor: What did you receive?';
+  const combos=isPres?[
+    {cards:['L','L','L'], label:'3 Liberal', cls:'lib'},
+    {cards:['L','L','F'], label:'2 Lib · 1 Fas', cls:'mix'},
+    {cards:['L','F','F'], label:'1 Lib · 2 Fas', cls:'mix'},
+    {cards:['F','F','F'], label:'3 Fascist', cls:'fas'},
+  ]:[
+    {cards:['L','L'], label:'2 Liberal', cls:'lib'},
+    {cards:['L','F'], label:'1 Lib · 1 Fas', cls:'mix'},
+    {cards:['F','F'], label:'2 Fascist', cls:'fas'},
+  ];
+  let h=`<div class="claim-panel"><div class="claim-title">${label}</div><div class="claim-combos">`;
+  combos.forEach((c,i)=>{
+    const sel=selectedClaim===i;
+    h+=`<button class="claim-combo ${c.cls}${sel?' sel':''}" onclick="selectClaim(${i})"><span class="claim-combo-icons">${claimCardImgs(c.cards)}</span><span class="claim-combo-label">${c.label}</span></button>`;
+  });
+  h+=`</div><div class="claim-row"><button class="btn btn-sm btn-gold" onclick="submitClaim()" ${selectedClaim!==null?'':'disabled'}>Submit Claim</button><button class="btn btn-sm btn-secondary" onclick="skipClaim()">Skip</button></div></div>`;
+  return h;
+}
+
+function renderClaimPanel(){ renderPhasePanel(); }
+
+function selectClaim(idx){
+  selectedClaim=selectedClaim===idx?null:idx;
+  renderClaimPanel();
+}
+
+function submitClaim(){
+  if(!pendingClaim||selectedClaim===null)return;
+  const isPres=pendingClaim==='president';
+  const combos=isPres?[
+    ['L','L','L'],['L','L','F'],['L','F','F'],['F','F','F'],
+  ]:[
+    ['L','L'],['L','F'],['F','F'],
+  ];
+  const cards=combos[selectedClaim];
+  send({type:'claim',claimRole:pendingClaim,cards});
+  pendingClaim=null;selectedClaim=null;
+  renderPhasePanel();
+}
+
+function skipClaim(){
+  pendingClaim=null;selectedClaim=null;
+  send({type:'skipClaim'});
+  renderPhasePanel();
+}
+
+// ─── EMOTES ──────────────────────────────────────────────────
+const EMOTES = {
+  smile:'😀', grin:'😁', laugh:'😂', rofl:'🤣', joy:'😂', wink:'😉',
+  tongue:'😜', thinking:'🤔', smirk:'😏', unamused:'😒', rolling_eyes:'🙄',
+  flushed:'😳', scream:'😱', angry:'😠', rage:'😡', cry:'😢', sob:'😭',
+  skull:'💀', clown:'🤡', devil:'😈', angel:'😇', cool:'😎', nerd:'🤓',
+  shush:'🤫', liar:'🤥', sweat:'😅', worried:'😟', sus:'🤨', innocent:'😇',
+  thumbsup:'👍', thumbsdown:'👎', clap:'👏', wave:'👋', pray:'🙏',
+  handshake:'🤝', point:'👉', fist:'✊', ok:'👌', salute:'🫡',
+  eagle:'🦅', dove:'🕊️', fire:'🔥', bomb:'💣', target:'🎯',
+  crown:'👑', dagger:'🗡️', shield:'🛡️', coffin:'⚰️', vote:'🗳️',
+  spy:'🕵️', detective:'🔍', snake:'🐍', rat:'🐀', wolf:'🐺',
+  eyes:'👀', eye:'👁️', brain:'🧠', heart:'❤️', broken_heart:'💔',
+  check:'✅', x:'❌', question:'❓', exclaim:'❗', warning:'⚠️',
+  star:'⭐', trophy:'🏆', party:'🎉', confetti:'🎊', gg:'🏁',
+  cap:'🧢', nocap:'🚫🧢', sus2:'📮', copium:'💊',
+  lib:'🕊️', fas:'⚡', hitler:'💀', ja:'✅', nein:'❌',
+};
+const EMOTE_CATEGORIES = {
+  'Faces': ['smile','grin','laugh','rofl','wink','tongue','thinking','smirk','unamused','rolling_eyes','flushed','scream','angry','rage','cry','sob','skull','clown','devil','angel','cool','nerd','shush','liar','sweat','worried','sus','innocent'],
+  'Hands': ['thumbsup','thumbsdown','clap','wave','pray','handshake','point','fist','ok','salute'],
+  'Game': ['eagle','dove','fire','bomb','target','crown','dagger','shield','coffin','vote','spy','detective','snake','rat','wolf','eyes','eye','brain','heart','broken_heart','lib','fas','ja','nein'],
+  'React': ['check','x','question','exclaim','warning','star','trophy','party','confetti','gg','cap','sus2'],
+};
+
+// ─── 7TV EMOTES ──────────────────────────────────────────────
+let seventvEmotes = {};
+let seventvLoaded = false;
+function getStvKey(){ const n=localStorage.getItem('sh-name'); return n?'sh-7tv-'+n:'sh-7tv-sets'; }
+let customStvSets = JSON.parse(localStorage.getItem(getStvKey()) || '[]');
+
+function share7tvWithRoom(emotes) {
+  if (!myRoom) return;
+  emotes.forEach(e => { send({type:'share7tv', emoteId:e.id, emoteName:e.name}); });
+}
+
+function add7tvEmotes(emotes, share) {
+  emotes.forEach(e => {
+    const name = e.name;
+    const id = e.id;
+    seventvEmotes[name] = {
+      url: `https://cdn.7tv.app/emote/${id}/1x.webp`,
+      url2x: `https://cdn.7tv.app/emote/${id}/2x.webp`,
+      id, name
+    };
+  });
+  if (share) share7tvWithRoom(emotes);
+}
+
+function load7TV() {
+  if (seventvLoaded) return;
+  seventvLoaded = true;
+  fetch('https://7tv.io/v3/emote-sets/global').then(r=>r.json()).then(data => {
+    if (data.emotes) add7tvEmotes(data.emotes);
+    customStvSets.forEach(url => loadCustom7tv(url, true));
+    updatePickerGrid();
+  }).catch(() => {});
+}
+
+function loadCustom7tv(url, silent) {
+  const raw = url.trim();
+
+  const shouldShare = !silent;
+
+  // Single emote: cdn.7tv.app/emote/ID/... or 7tv.io/emotes/ID
+  const emoteMatch = raw.match(/cdn\.7tv\.app\/emote\/([a-zA-Z0-9]+)/i) || raw.match(/7tv\.io\/emotes\/([a-zA-Z0-9]+)/i);
+  if (emoteMatch) {
+    const emoteId = emoteMatch[1];
+    fetch(`https://7tv.io/v3/emotes/${emoteId}`).then(r=>r.json()).then(e => {
+      if (e.id && e.name) {
+        add7tvEmotes([{ id: e.id, name: e.name }], shouldShare);
+        saveCustomSet(raw);
+        updatePickerGrid();
+        if (!silent) toast(`Added emote: ${e.name}`,'ok');
+      }
+    }).catch(() => { if (!silent) toast('Failed to load 7TV emote','err'); });
+    return;
+  }
+
+  // User URL: 7tv.io/users/ID
+  const um = raw.match(/7tv\.io\/users\/([a-zA-Z0-9]+)/i);
+  if (um) {
+    fetch(`https://7tv.io/v3/users/${um[1]}`).then(r=>r.json()).then(u => {
+      if (u.emote_set?.emotes) {
+        add7tvEmotes(u.emote_set.emotes, shouldShare);
+        saveCustomSet(raw);
+        updatePickerGrid();
+        if (!silent) toast(`Added ${u.emote_set.emotes.length} emotes from ${u.display_name||'user'}`,'ok');
+      }
+    }).catch(() => { if (!silent) toast('Failed to load 7TV user','err'); });
+    return;
+  }
+
+  // Emote set URL or raw ID
+  const setMatch = raw.match(/7tv\.io\/emote-sets\/([a-zA-Z0-9]+)/i) || raw.match(/^([a-zA-Z0-9]{20,})$/i);
+  if (setMatch) {
+    fetch(`https://7tv.io/v3/emote-sets/${setMatch[1]}`).then(r=>r.json()).then(data => {
+      if (data.emotes) {
+        add7tvEmotes(data.emotes, shouldShare);
+        saveCustomSet(raw);
+        updatePickerGrid();
+        if (!silent) toast(`Added ${data.emotes.length} emotes from ${data.name||'set'}`,'ok');
+      }
+    }).catch(() => { if (!silent) toast('Failed to load 7TV emote set','err'); });
+    return;
+  }
+
+  if (!silent) toast('Paste a 7TV emote, user, or emote set link','err');
+}
+
+function saveCustomSet(url) {
+  if (!customStvSets.includes(url)) {
+    customStvSets.push(url);
+    localStorage.setItem(getStvKey(), JSON.stringify(customStvSets));
+  }
+}
+
+function processEmotes(escaped) {
+  let result = escaped.replace(/:([a-zA-Z_0-9]+):/g, (match, code) => {
+    const lc = code.toLowerCase();
+    if (EMOTES[lc]) return `<span title=":${code}:">${EMOTES[lc]}</span>`;
+    const stv = seventvEmotes[code];
+    if (stv) return `<img class="stv-emote" src="${stv.url}" srcset="${stv.url2x} 2x" alt="${code}" title="${code}">`;
+    return match;
+  });
+  if (Object.keys(seventvEmotes).length) {
+    result = result.replace(/(?<![:\w])([A-Za-z]\w{1,})(?![\w:])/g, (match, word) => {
+      const stv = seventvEmotes[word];
+      if (stv) return `<img class="stv-emote" src="${stv.url}" srcset="${stv.url2x} 2x" alt="${word}" title="${word}">`;
+      return match;
+    });
+  }
+  return result;
+}
+
+// Picker uses a stable structure: search input + grid div, only grid gets rebuilt
+function initEmotePicker() {
+  const picker = document.getElementById('emote-picker');
+  if (!picker || picker.dataset.init) return;
+  picker.dataset.init = '1';
+  picker.innerHTML = `
+    <div class="emote-search-row">
+      <input class="emote-search" id="emote-search" placeholder="Search emotes…">
+    </div>
+    <div class="emote-import-row">
+      <input class="emote-search" id="stv-import" placeholder="Paste 7TV link to import…" style="font-size:.72rem;">
+      <button class="btn btn-sm btn-gold" style="padding:.2rem .5rem;font-size:.6rem;" onclick="do7tvImport()">Add</button>
+    </div>
+    <div id="emote-grid"></div>`;
+  document.getElementById('emote-search').addEventListener('input', e => updatePickerGrid(e.target.value));
+  document.getElementById('stv-import').addEventListener('keydown', e => { if(e.key==='Enter') do7tvImport(); });
+}
+
+function do7tvImport() {
+  const inp = document.getElementById('stv-import');
+  const url = inp.value.trim();
+  if (!url) return;
+  loadCustom7tv(url, false);
+  inp.value = '';
+}
+
+function updatePickerGrid(search) {
+  const grid = document.getElementById('emote-grid');
+  if (!grid) return;
+  const q = (search || '').toLowerCase();
+
+  let html = '';
+
+  // Built-in
+  if (!q) {
+    for (const [cat, codes] of Object.entries(EMOTE_CATEGORIES)) {
+      html += `<div class="emote-pick-cat">${cat}</div>`;
+      for (const code of codes) html += `<button class="emote-pick" title=":${code}:" onclick="insertEmote('${code}')">${EMOTES[code]}</button>`;
+    }
+  } else {
+    const matched = Object.keys(EMOTES).filter(k => k.includes(q));
+    if (matched.length) {
+      html += `<div class="emote-pick-cat">Emoji</div>`;
+      matched.forEach(code => { html += `<button class="emote-pick" title=":${code}:" onclick="insertEmote('${code}')">${EMOTES[code]}</button>`; });
+    }
+  }
+
+  // 7TV
+  const stvKeys = Object.keys(seventvEmotes);
+  if (stvKeys.length) {
+    const filtered = q ? stvKeys.filter(k => k.toLowerCase().includes(q)) : stvKeys;
+    const show = filtered.slice(0, 100);
+    if (show.length) {
+      html += `<div class="emote-pick-cat">7TV (${filtered.length})</div>`;
+      show.forEach(name => {
+        const e = seventvEmotes[name];
+        html += `<button class="emote-pick stv-pick" title="${name}" onclick="insertEmote('${name}')"><img src="${e.url}" alt="${name}" loading="lazy"></button>`;
+      });
+      if (filtered.length > 100) html += `<div class="emote-pick-cat" style="opacity:.5;">Type to search more…</div>`;
+    }
+  } else {
+    html += `<div class="emote-pick-cat" style="opacity:.5;">Loading 7TV…</div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function toggleEmotePicker(e) {
+  e.stopPropagation();
+  load7TV();
+  const picker = document.getElementById('emote-picker');
+  initEmotePicker();
+  updatePickerGrid();
+  picker.classList.toggle('open');
+  if (picker.classList.contains('open')) {
+    setTimeout(() => { const s = document.getElementById('emote-search'); if (s) s.focus(); }, 50);
+  }
+}
+
+function insertEmote(code) {
+  const input = document.getElementById('chat-input');
+  const start = input.selectionStart;
+  const end = input.selectionEnd;
+  const isStv = !!seventvEmotes[code];
+  const emote = isStv ? `${code} ` : `:${code}: `;
+  input.value = input.value.substring(0, start) + emote + input.value.substring(end);
+  input.focus();
+  input.selectionStart = input.selectionEnd = start + emote.length;
+}
+
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('emote-picker');
+  if (picker && !picker.contains(e.target) && e.target.id !== 'emote-toggle') {
+    picker.classList.remove('open');
+  }
+});
+
+// ─── CHAT ────────────────────────────────────────────────────
+let chatMessages=[];
+function appendChat(msg){
+  chatMessages.push(msg);
+  if(chatMessages.length>200) chatMessages.shift();
+  const wrap=document.getElementById('chat-msgs');
+  if(!wrap)return;
+  const isMe=msg.playerId===myId;
+  const t=new Date(msg.ts);
+  const time=t.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+  const div=document.createElement('div');
+  div.className='chat-msg'+(isMe?' me':'');
+  const nc=msg.nameColor?`style="color:${msg.nameColor}"`:'';
+  div.innerHTML=`<div class="chat-name" ${nc}>${escHtml(msg.name)}<span class="chat-time">${time}</span></div><div class="chat-text">${processEmotes(escHtml(msg.text))}</div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop=wrap.scrollHeight;
+  const chatDock=document.getElementById('dock-chat');
+  if(chatDock&&chatDock.classList.contains('collapsed')) document.getElementById('chat-badge').style.display='inline';
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function sendChat(){
+  const input=document.getElementById('chat-input');
+  const txt=input.value.trim();
+  if(!txt)return;
+  send({type:'chat',text:txt});
+  input.value='';
+  document.getElementById('emote-picker').classList.remove('open');
+}
+
+// ─── LOG ─────────────────────────────────────────────────────
+const ICONS={pres:'🎩',chan:'📜',elect:'🗳',inv:'🔍',veto:'✋',kill:'💀',note:'📝',chaos:'⚠️',claim:'💬'};
+let logFilter='all';
+function setLogFilter(f,btn){
+  logFilter=f;
+  document.querySelectorAll('.log-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLog();
+}
+function renderLog(){
+  const wrap=document.getElementById('g-log'); const log=myRoom?.log||[];
+  if(!log.length){wrap.innerHTML='<div class="help-txt">No events yet.</div>';return;}
+  const filtered=logFilter==='all'?log:log.filter(e=>e.type===logFilter);
+  if(!filtered.length){wrap.innerHTML='<div class="help-txt">No matching entries.</div>';return;}
+  let html='',lr=-1;
+  filtered.forEach(e=>{
+    if(e.round&&e.round!==lr&&e.type!=='note'){html+=`<div class="rnd-hdr">— Round ${e.round} —</div>`;lr=e.round;}
+    const eid=JSON.stringify(e.id);
+    html+=`<div class="log-entry le-${e.type||'note'}">
+      <div class="log-icon">${ICONS[e.type]||'📌'}</div>
+      <div class="log-body">
+        ${e.meta?`<div class="log-meta">${e.meta}</div>`:''}
+        <div class="log-text">${e.text}</div>
+        ${e.enacted?`<div style="margin-top:.2rem;font-family:'Special Elite',monospace;font-size:.58rem;color:${e.enacted==='L'?'var(--blue)':'var(--red)'};">Enacted: ${e.enacted==='L'?'🕊 Liberal':'⚡ Fascist'}</div>`:''}
+      </div>
+      <button class="log-del" onclick='send({type:"deleteLog",id:${eid}})'>✕</button>
+    </div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+// ─── LOCAL NOTES ─────────────────────────────────────────────
+function notesKey(){ return 'sh-notes-'+myId; }
+function loadNotes(){
+  const ta=document.getElementById('my-notes');
+  if(!ta||!myId) return;
+  ta.value=localStorage.getItem(notesKey())||'';
+}
+function saveNotes(){
+  if(!myId) return;
+  localStorage.setItem(notesKey(), document.getElementById('my-notes').value);
+}
+
+// ─── WIN ─────────────────────────────────────────────────────
+function showWin(){
+  const r=myRoom; if(!r.winner)return;
+  saveGameHistory(r);
+  const iL=r.winner==='liberal';
+  const box=document.getElementById('win-box');
+  box.className='win-box '+(iL?'lib':'fas');
+  document.getElementById('win-icon').textContent=iL?'🕊':'⚡';
+  document.getElementById('win-title').textContent=iL?'Liberals Win!':'Fascists Win!';
+  document.getElementById('win-msg').textContent=r.winReason||(iL?'The Republic is saved!':'Hitler seizes power!');
+  document.getElementById('win-again').style.display=r.hostId===myId?'':'none';
+  document.getElementById('win-bg').classList.add('open');
+}
+
+// ─── PROFILE & HISTORY ──────────────────────────────────────
+function getHistory(){ try{ return JSON.parse(localStorage.getItem('sh-history'))||[]; }catch{ return []; } }
+function setHistory(h){ localStorage.setItem('sh-history',JSON.stringify(h)); }
+
+function saveGameHistory(r){
+  const gameKey=r.code+'-'+r.winner;
+  if(lastSavedGame===gameKey) return;
+  lastSavedGame=gameKey;
+
+  const role=myRole||r.players.find(p=>p.id===myId)?.role||'unknown';
+  const myTeam=role==='liberal'?'liberal':'fascist';
+  const won=r.winner===myTeam;
+
+  const entry={
+    date: new Date().toISOString(),
+    role: role,
+    result: won?'win':'loss',
+    winner: r.winner,
+    players: r.players.length,
+    code: r.code,
+  };
+  const h=getHistory();
+  h.unshift(entry);
+  if(h.length>50) h.length=50;
+  setHistory(h);
+}
+
+function renderProfile(){
+  const h=getHistory();
+  const wins=h.filter(e=>e.result==='win').length;
+  const losses=h.length-wins;
+  document.getElementById('stat-games').textContent=h.length;
+  document.getElementById('stat-wins').textContent=wins;
+  document.getElementById('stat-losses').textContent=losses;
+  document.getElementById('stat-rate').textContent=h.length?Math.round(wins/h.length*100)+'%':'—';
+
+  const list=document.getElementById('history-list');
+  if(!h.length){ list.innerHTML='<div class="hist-empty">No games played yet.</div>'; return; }
+
+  const roleIcons={liberal:'🕊',fascist:'🔴',hitler:'⚡'};
+  const roleNames={liberal:'Liberal',fascist:'Fascist',hitler:'Hitler'};
+  const roleCls={liberal:'lib',fascist:'fas',hitler:'hit'};
+
+  list.innerHTML=h.map(e=>{
+    const d=new Date(e.date);
+    const dateStr=d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+    const timeStr=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+    const rc=roleCls[e.role]||'lib';
+    const winnerLabel=e.winner==='liberal'?'Liberals won':'Fascists won';
+    return `<div class="hist-item ${e.result}">
+      <div class="hist-result">${e.result==='win'?'WIN':'LOSS'}</div>
+      <div class="hist-role ${rc}">${roleIcons[e.role]||'?'} ${roleNames[e.role]||e.role}</div>
+      <div class="hist-winner">${winnerLabel} · ${e.players}p</div>
+      <div class="hist-date">${dateStr} ${timeStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory(){
+  if(!confirm('Clear all game history?')) return;
+  setHistory([]);
+  renderProfile();
+  toast('History cleared','ok');
+}
+
+// ─── TABS ────────────────────────────────────────────────────
+// ─── DOCK PANELS ─────────────────────────────────────────────
+function toggleDock(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const wasCollapsed=el.classList.contains('collapsed');
+  el.classList.toggle('collapsed');
+  el.classList.toggle('expanded');
+  if(wasCollapsed && id==='dock-chat'){
+    document.getElementById('chat-badge').style.display='none';
+  }
+}
+
+(function(){
+  const container=document.getElementById('g-right');
+  if(!container) return;
+  let dragEl=null;
+
+  container.addEventListener('dragstart',e=>{
+    const panel=e.target.closest('.dock-panel');
+    if(!panel) return;
+    dragEl=panel;
+    panel.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain','');
+  });
+
+  container.addEventListener('dragend',e=>{
+    if(dragEl) dragEl.classList.remove('dragging');
+    dragEl=null;
+    container.querySelectorAll('.dock-panel').forEach(p=>p.style.borderTop='');
+  });
+
+  container.addEventListener('dragover',e=>{
+    e.preventDefault();
+    e.dataTransfer.dropEffect='move';
+    const target=e.target.closest('.dock-panel');
+    container.querySelectorAll('.dock-panel').forEach(p=>p.style.borderTop='');
+    if(target&&target!==dragEl){
+      const rect=target.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      if(e.clientY<mid) target.style.borderTop='3px solid var(--accent)';
+      else target.style.borderBottom='3px solid var(--accent)';
+    }
+  });
+
+  container.addEventListener('dragleave',e=>{
+    const target=e.target.closest('.dock-panel');
+    if(target){target.style.borderTop='';target.style.borderBottom='';}
+  });
+
+  container.addEventListener('drop',e=>{
+    e.preventDefault();
+    const target=e.target.closest('.dock-panel');
+    if(!target||!dragEl||target===dragEl) return;
+    const rect=target.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    if(e.clientY<mid) container.insertBefore(dragEl,target);
+    else container.insertBefore(dragEl,target.nextSibling);
+    container.querySelectorAll('.dock-panel').forEach(p=>{p.style.borderTop='';p.style.borderBottom='';});
+  });
+})();
+
+// ─── UTILS ───────────────────────────────────────────────────
+function showScreen(id){ currentScreen=id; document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id==='s-lobby') renderProfile(); }
+function toast(msg,type=''){ const d=document.createElement('div'); d.className=`toast${type?' '+type:''}`; d.textContent=msg; document.getElementById('toasts').appendChild(d); setTimeout(()=>{ d.style.opacity='0'; d.style.transition='all .3s'; setTimeout(()=>d.remove(),300); },2600); }
+
+function handleSpecialEvent(event){
+  if(event==='dehua'){
+    try{
+      const popup=document.getElementById('video-popup');
+      const container=document.getElementById('video-container');
+      if(!popup||!container){console.error('video popup elements not found');return;}
+      container.innerHTML=`<iframe width="100%" height="100%" src="https://www.youtube.com/embed/FJ3N_2r6R-o?autoplay=1&rel=0" title="dehua" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
+      popup.style.display='flex';
+    }catch(ex){console.error('specialEvent error',ex);}
+  }
+}
+function closeVideoPopup(){
+  const popup=document.getElementById('video-popup');
+  document.getElementById('video-container').innerHTML='';
+  popup.style.display='none';
+}
+
+// ─── THEME ───────────────────────────────────────────────────
+function getTheme(){ return localStorage.getItem('sh-theme')||'light'; }
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'');
+  const icon=t==='dark'?'☀️':'🌙';
+  document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent=icon);
+}
+function toggleTheme(){ const t=getTheme()==='dark'?'light':'dark'; localStorage.setItem('sh-theme',t); applyTheme(t); }
+applyTheme(getTheme());
+
+// ─── INIT ────────────────────────────────────────────────────
+document.getElementById('l-code').addEventListener('keydown',e=>{ if(e.key==='Enter')doJoin(); });
+const savedName=localStorage.getItem('sh-name');
+if(savedName) document.getElementById('l-name').value=savedName;
+const savedColor=localStorage.getItem('sh-name-color');
+if(savedColor) document.getElementById('l-name-color').value=savedColor;
+function syncColorPickers(c){
+  document.getElementById('l-name').style.color=c;
+  ['l-name-color','wr-name-color','g-name-color'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value=c;
+  });
+}
+function changeColor(c){
+  localStorage.setItem('sh-name-color',c);
+  syncColorPickers(c);
+  if(myRoom) send({type:'setNameColor',color:c});
+}
+syncColorPickers(localStorage.getItem('sh-name-color')||'#d4a017');
+document.getElementById('l-name').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('l-code').focus(); });
+document.getElementById('l-name-color').addEventListener('input',e=>changeColor(e.target.value));
+document.getElementById('my-notes').addEventListener('input', saveNotes);
+document.getElementById('chat-input').addEventListener('keydown',e=>{ if(e.key==='Enter')sendChat(); });
+// ─── RESIZABLE DIVIDER ───────────────────────────────────────
+(function(){
+  const div=document.getElementById('g-divider');
+  if(!div) return;
+  let dragging=false, startX=0, startLeftW=0;
+  div.addEventListener('mousedown',e=>{
+    e.preventDefault(); dragging=true; startX=e.clientX;
+    const left=document.querySelector('.g-left');
+    startLeftW=left.getBoundingClientRect().width;
+    div.classList.add('dragging');
+    document.body.style.cursor='col-resize'; document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    const grid=document.querySelector('.g-grid');
+    const gridW=grid.getBoundingClientRect().width;
+    const dx=e.clientX-startX;
+    const newLeft=Math.max(250,Math.min(gridW-250,startLeftW+dx));
+    const pct=(newLeft/gridW)*100;
+    document.querySelector('.g-left').style.flex='0 0 '+pct+'%';
+    document.querySelector('.g-right').style.flex='1';
+  });
+  document.addEventListener('mouseup',()=>{
+    if(!dragging) return; dragging=false;
+    div.classList.remove('dragging');
+    document.body.style.cursor=''; document.body.style.userSelect='';
+  });
+})();
+
+renderProfile();
+connect();
+load7TV();
+</script>
+</body>
+</html>

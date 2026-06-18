@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: secret-hitler-tracker
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 3000

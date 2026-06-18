@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 240">
+  <defs>
+    <clipPath id="outer"><rect width="180" height="240" rx="12"/></clipPath>
+  </defs>
+  <g clip-path="url(#outer)">
+    <!-- Background -->
+    <rect width="180" height="240" rx="12" fill="#f0fbfd"/>
+    <!-- Outer border -->
+    <rect x="3" y="3" width="174" height="234" rx="10" fill="none" stroke="#3cc8dc" stroke-width="7"/>
+    <!-- Inner border -->
+    <rect x="12" y="12" width="156" height="216" rx="6" fill="none" stroke="#3cc8dc" stroke-width="2" opacity=".4"/>
+    <!-- Dove -->
+    <g transform="translate(55,28) scale(0.55)" fill="#3cc8dc" opacity=".85">
+      <path d="M60 10 C40 0 15 5 8 30 C5 40 10 55 25 60 L20 75 C20 75 35 65 45 60 C55 55 65 58 75 65 C90 55 100 40 95 25 C90 15 75 8 60 10Z"/>
+      <path d="M25 60 C15 70 5 85 0 95 L15 80 C20 73 22 67 25 60Z" opacity=".7"/>
+    </g>
+    <!-- LIBERAL vertical text -->
+    <text x="28" y="145" font-family="'Playfair Display',Georgia,serif" font-size="22" font-weight="900" fill="#2aafbf" letter-spacing=".1em" text-anchor="middle" transform="rotate(-90 28 145)">LIBERAL</text>
+    <!-- ARTICLE -->
+    <text x="108" y="115" font-family="'Playfair Display',Georgia,serif" font-size="12" font-weight="700" fill="#2aafbf" letter-spacing=".18em" text-anchor="middle" opacity=".7">ARTICLE</text>
+    <!-- Barcode lines -->
+    <g stroke="#2aafbf" opacity=".3" stroke-width="2.5">
+      <line x1="70" y1="130" x2="146" y2="130"/>
+      <line x1="74" y1="137" x2="142" y2="137"/>
+      <line x1="78" y1="144" x2="138" y2="144"/>
+      <line x1="70" y1="151" x2="146" y2="151"/>
+      <line x1="76" y1="158" x2="140" y2="158"/>
+      <line x1="82" y1="165" x2="134" y2="165"/>
+      <line x1="72" y1="172" x2="144" y2="172"/>
+      <line x1="78" y1="179" x2="138" y2="179"/>
+      <line x1="74" y1="186" x2="142" y2="186"/>
+      <line x1="80" y1="193" x2="136" y2="193"/>
+      <line x1="70" y1="200" x2="146" y2="200"/>
+      <line x1="76" y1="207" x2="140" y2="207"/>
+    </g>
+  </g>
+</svg>

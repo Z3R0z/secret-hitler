@@ -215,7 +215,7 @@ function triggerChaos(room) {
   room.electionFails = 0;
   addLog(room, {
     type: 'chaos',
-    text: `⚠️ 3 failed elections — top card enacted automatically: ${pol === 'L' ? '🕊 Liberal' : '⚡ Fascist'}. Tracker reset.`,
+    text: `⚠️ 3 failed elections — top card enacted automatically: ${pol === 'L' ? '<img src="card-liberal.svg" style="height:2em;vertical-align:middle;">' : '<img src="card-fascist.svg" style="height:2em;vertical-align:middle;">'}. Tracker reset.`,
     meta: `ROUND ${room.round} · AUTO`,
   });
   checkWin(room);
@@ -306,8 +306,8 @@ function timerExpired(room) {
     const jas = alive.filter(p => room.votes[p.id] === 'ja').length;
     const neins = alive.length - jas;
     const passed = jas > neins;
-    const voteStr = alive.map(p => `${p.name}: ${room.votes[p.id].toUpperCase()}`).join(', ');
-    addLog(room, { type: 'elect', text: `⏱ Vote timed out. ${passed ? '✓ JA passed' : '✗ NEIN failed'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
+    const voteStr = alive.map(p => `${p.name}: ${room.votes[p.id]==='ja'?'<span style="color:#16a34a;">✓</span>':'<span style="color:#c0392b;">✗</span>'}`).join(', ');
+    addLog(room, { type: 'elect', text: `⏱ Vote timed out. ${passed ? '<span style="color:#16a34a;">✓ Passed</span>' : '<span style="color:#c0392b;">✗ Failed</span>'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
 
     if (passed) {
       room.chanIdx = room.nomineeIdx;
@@ -350,7 +350,7 @@ function timerExpired(room) {
     if (enacted === 'L') room.libPolicies = Math.min(5, room.libPolicies + 1);
     else room.fasPolicies = Math.min(6, room.fasPolicies + 1);
     room.electionFails = 0;
-    addLog(room, { type: 'chan', text: `⏱ ${room.players[room.chanIdx].name} (Chan.) timed out — auto-enacted ${enacted === 'L' ? '🕊 Liberal' : '⚡ Fascist'}.`, meta: `ROUND ${room.round}`, enacted });
+    addLog(room, { type: 'chan', text: `⏱ ${room.players[room.chanIdx].name} (Chan.) timed out — auto-enacted ${enacted === 'L' ? '<img src="card-liberal.svg" style="height:2em;vertical-align:middle;">' : '<img src="card-fascist.svg" style="height:2em;vertical-align:middle;">'}.`, meta: `ROUND ${room.round}`, enacted });
     if (checkWin(room)) { broadcastState(room); return; }
     const power = enacted === 'F' ? getPower(room.fasPolicies, room.players.length) : null;
     if (power) { room.activePower = power; room.roundPhase = 'power'; addLog(room, { type: 'note', text: `⚡ Executive power: ${powerName(power)}.`, meta: `ROUND ${room.round}` }); }
@@ -732,6 +732,42 @@ function botUsePower(room, bot) {
   }
 
   return alive[Math.floor(Math.random() * alive.length)].i;
+}
+
+function botPresidentClaim(room, bot, drewCards, enacted) {
+  const cards = [...drewCards];
+  if (bot.role === 'fascist' || bot.role === 'hitler') {
+    const libCount = cards.filter(c => c === 'L').length;
+    // If enacted fascist and had liberal cards, lie — claim all fascist
+    if (enacted === 'F' && libCount > 0 && Math.random() > 0.25) {
+      return ['F', 'F', 'F'];
+    }
+    // Sometimes downplay liberal cards
+    if (libCount >= 2 && Math.random() > 0.5) {
+      return ['L', 'F', 'F'];
+    }
+  }
+  return cards;
+}
+
+function botChancellorClaim(room, bot, receivedCards, enacted) {
+  const cards = [...receivedCards];
+  if (bot.role === 'fascist' || bot.role === 'hitler') {
+    // If enacted fascist but had a liberal, lie — claim got 2 fascist
+    if (enacted === 'F' && cards.includes('L') && Math.random() > 0.2) {
+      return ['F', 'F'];
+    }
+  }
+  // Liberal who was forced (2F) tells truth
+  return cards;
+}
+
+function submitBotClaim(room, bot, claimRole, claimedCards, claimRound) {
+  const cardStr = claimedCards.map(c => c === 'L' ? '<span style="color:#2563eb;font-weight:700;">B</span>' : '<span style="color:#c0392b;font-weight:700;">R</span>').join(' ');
+  const roleLabel = claimRole === 'president' ? 'Pres.' : 'Chan.';
+  const rnd = claimRound || room.round;
+  addLog(room, { type: 'claim', text: `${bot.name} (${roleLabel}): ${cardStr}`, meta: `ROUND ${rnd} · CLAIM`, round: rnd });
+  broadcastState(room);
 }
 
 function botVetoResponse(room, bot) {
@@ -1134,8 +1170,8 @@ function triggerBotActions(room) {
           const jas = alive.filter(pl => room.votes[pl.id] === 'ja').length;
           const neins = alive.length - jas;
           const passed = jas > neins;
-          const voteStr = alive.map(pl => `${pl.name}: ${room.votes[pl.id].toUpperCase()}`).join(', ');
-          addLog(room, { type: 'elect', text: `Vote: ${passed ? '✓ JA passed' : '✗ NEIN failed'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
+          const voteStr = alive.map(pl => `${pl.name}: ${room.votes[pl.id]==='ja'?'<span style="color:#16a34a;">✓</span>':'<span style="color:#c0392b;">✗</span>'}`).join(', ');
+          addLog(room, { type: 'elect', text: `Vote: ${passed ? '<span style="color:#16a34a;">✓ Passed</span>' : '<span style="color:#c0392b;">✗ Failed</span>'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
 
           if (passed) {
             room.chanIdx = room.nomineeIdx;
@@ -1236,7 +1272,7 @@ function triggerBotActions(room) {
       if (enacted === 'L') room.libPolicies = Math.min(5, room.libPolicies + 1);
       else room.fasPolicies = Math.min(6, room.fasPolicies + 1);
       room.electionFails = 0;
-      addLog(room, { type: 'chan', text: `${chan.name} (Chan.) enacted ${enacted === 'L' ? '🕊 Liberal' : '⚡ Fascist'} policy.`, meta: `ROUND ${room.round}`, enacted });
+      addLog(room, { type: 'chan', text: `${chan.name} (Chan.) enacted ${enacted === 'L' ? '<img src="card-liberal.svg" style="height:2em;vertical-align:middle;">' : '<img src="card-fascist.svg" style="height:2em;vertical-align:middle;">'} policy.`, meta: `ROUND ${room.round}`, enacted });
 
       // Bot chat: claims and reactions
       const presBot = room.players[room.presIdx];
@@ -1256,18 +1292,20 @@ function triggerBotActions(room) {
           scheduleBotChat(room, 'accuse', { target: suspectTarget.name });
         }, 4000 + Math.random() * 2000);
       }
-      // Bot president claims what they drew
+      // Bot claims (capture round before it advances)
+      const claimRound = room.round;
       if (presBot.isBot && room._lastPresId === presBot.id) {
+        const presClaimed = botPresidentClaim(room, presBot, room._lastPresDrew || ['F','F','F'], enacted);
         setTimeout(() => {
           if (!rooms.has(room.code)) return;
-          scheduleBotChat(room, 'presClaim', { botId: presBot.id, drew: room._lastPresDrew, enacted });
-        }, 2000 + Math.random() * 1500);
+          submitBotClaim(room, presBot, 'president', presClaimed, claimRound);
+        }, 1500 + Math.random() * 1500);
       }
-      // Bot chancellor claims what they received
+      const chanClaimed = botChancellorClaim(room, chan, receivedCopy, enacted);
       setTimeout(() => {
         if (!rooms.has(room.code)) return;
-        scheduleBotChat(room, 'chanClaim', { botId: chan.id, received: receivedCopy, enacted });
-      }, 3500 + Math.random() * 2000);
+        submitBotClaim(room, chan, 'chancellor', chanClaimed, claimRound);
+      }, 3000 + Math.random() * 2000);
       // Endgame commentary
       if (room.libPolicies >= 4 || room.fasPolicies >= 4) {
         scheduleBotChat(room, 'endgame');
@@ -1684,8 +1722,8 @@ function handle(ws, msg) {
         const jas    = alive.filter(p => room.votes[p.id] === 'ja').length;
         const neins  = alive.length - jas;
         const passed = jas > neins;
-        const voteStr = alive.map(p => `${p.name}: ${room.votes[p.id].toUpperCase()}`).join(', ');
-        addLog(room, { type: 'elect', text: `Vote: ${passed ? '✓ JA passed' : '✗ NEIN failed'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
+        const voteStr = alive.map(p => `${p.name}: ${room.votes[p.id]==='ja'?'<span style="color:#16a34a;">✓</span>':'<span style="color:#c0392b;">✗</span>'}`).join(', ');
+        addLog(room, { type: 'elect', text: `Vote: ${passed ? '<span style="color:#16a34a;">✓ Passed</span>' : '<span style="color:#c0392b;">✗ Failed</span>'} (${jas}–${neins}). ${voteStr}.`, meta: `ROUND ${room.round}`, voteResult: passed ? 'ja' : 'nein' });
 
         if (passed) {
           room.chanIdx       = room.nomineeIdx;
@@ -1757,7 +1795,7 @@ function handle(ws, msg) {
       else                  room.fasPolicies = Math.min(6, room.fasPolicies + 1);
       room.electionFails = 0;
 
-      addLog(room, { type: 'chan', text: `${room.players[room.chanIdx].name} (Chan.) enacted ${enacted === 'L' ? '🕊 Liberal' : '⚡ Fascist'} policy.`, meta: `ROUND ${room.round}`, enacted });
+      addLog(room, { type: 'chan', text: `${room.players[room.chanIdx].name} (Chan.) enacted ${enacted === 'L' ? '<img src="card-liberal.svg" style="height:2em;vertical-align:middle;">' : '<img src="card-fascist.svg" style="height:2em;vertical-align:middle;">'} policy.`, meta: `ROUND ${room.round}`, enacted });
 
       // Bot reactions to human-enacted policy
       const chatCtx2 = { pres: room.players[room.presIdx].name, chan: room.players[room.chanIdx].name, enacted };

@@ -525,16 +525,17 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
     <div id="wr-tab-lobby">
       <label class="lbl" id="lbl-cnt">Players</label>
       <div class="count-row" id="wr-cnt-row"></div>
+      <div class="row" style="margin-bottom:.8rem;gap:.4rem;">
+        <button class="btn btn-primary" id="wr-start" onclick="doStart()" disabled>Start Game</button>
+        <button class="btn btn-secondary btn-sm" id="wr-shuffle" onclick="send({type:'shuffle'})">🔀 Shuffle</button>
+        <button class="btn btn-secondary btn-sm" id="wr-add-bot" onclick="send({type:'addBot'})">🤖 Add Bot</button>
+        <button class="btn btn-secondary btn-sm" id="wr-fill-bots" onclick="fillBots()">🤖 Fill Bots</button>
+        <span id="wr-status" class="muted"></span>
+      </div>
       <label class="lbl">Joined</label>
       <div class="slots" id="wr-slots"></div>
       <label class="lbl" style="margin-top:.65rem;">Seat Order</label>
       <div class="order-row" id="wr-order"></div>
-      <div class="row" style="margin-top:.8rem;gap:.4rem;">
-        <button class="btn btn-primary" id="wr-start" onclick="doStart()" disabled>Start Game</button>
-        <button class="btn btn-secondary btn-sm" id="wr-shuffle" onclick="send({type:'shuffle'})">🔀 Shuffle</button>
-        <button class="btn btn-secondary btn-sm" id="wr-add-bot" onclick="send({type:'addBot'})">🤖 Add Bot</button>
-        <span id="wr-status" class="muted"></span>
-      </div>
       <div style="margin-top:.65rem;"><button class="btn btn-sm btn-danger" onclick="doLeave()">Leave</button></div>
     </div>
 
@@ -789,7 +790,7 @@ function handle(msg){
       else if(currentScreen==='s-game'){
         if(myRoom.phase==='waiting'){
           document.getElementById('win-bg').classList.remove('open');
-          closeCardModal(); pendingClaim=null; selectedClaim=null; chatMessages=[];
+          closeCardModal(); pendingClaim=null; selectedClaim=null; availableClaims=[]; chatMessages=[];
           showScreen('s-waiting'); initWaiting(); renderWaiting();
         } else {
           renderGame(); if(myRoom.phase==='ended'){ closeCardModal(); showWin(); }
@@ -802,12 +803,10 @@ function handle(msg){
     case 'peek': myPeekCards=msg.cards; renderPhasePanel(); break;
     case 'investigate': myInvestResult={targetName:msg.targetName,party:msg.party}; renderPhasePanel(); break;
     case 'promptClaim':
-      if(msg.claimRole==='president' && presCardsReceived && !pendingClaim){
-        pendingClaim='president';
+      if(msg.claimRole==='president' && presCardsReceived){
         pendingClaimRound=msg.round||null;
-        pendingClaimQueue=[];
-        selectedClaim=null;
-        renderPhasePanel();
+        availableClaims=['president'];
+        renderGame();
       }
       break;
     case 'chat': appendChat(msg); break;
@@ -834,6 +833,7 @@ function initWaiting(){
   document.getElementById('wr-shuffle').style.display=isH?'':'none';
   document.getElementById('wr-start').style.display=isH?'':'none';
   document.getElementById('wr-add-bot').style.display=isH?'':'none';
+  document.getElementById('wr-fill-bots').style.display=isH?'':'none';
   document.getElementById('set-name').disabled=!isH;
   document.getElementById('set-hitler').disabled=!isH;
   document.getElementById('set-rebalance').disabled=!isH;
@@ -858,12 +858,13 @@ function renderWaiting(){
   }
   const oDiv=document.getElementById('wr-order'); oDiv.innerHTML='';
   r.players.forEach((p,i)=>{ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`<div class="chip-n">${i+1}</div><span>${p.name}</span>`; oDiv.appendChild(c); });
-  if(isH){ const rdy=r.players.length>=r.numPlayers; document.getElementById('wr-start').disabled=!rdy; document.getElementById('wr-add-bot').disabled=rdy; document.getElementById('wr-status').textContent=rdy?'All players ready!':'Waiting for more players…'; }
+  if(isH){ const rdy=r.players.length>=r.numPlayers; document.getElementById('wr-start').disabled=!rdy; document.getElementById('wr-add-bot').disabled=rdy; document.getElementById('wr-fill-bots').disabled=rdy; document.getElementById('wr-status').textContent=rdy?'All players ready!':'Waiting for more players…'; }
   else document.getElementById('wr-status').textContent='Waiting for host to start…';
   syncSettings();
 }
 
 function doStart(){ send({type:'start'}); }
+function fillBots(){ if(!myRoom) return; const need=myRoom.numPlayers-myRoom.players.length; for(let i=0;i<need;i++) send({type:'addBot'}); }
 function switchWrTab(tab,btn){
   document.querySelectorAll('.wr-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -1312,9 +1313,13 @@ function renderMatOverlay(phaseHtml, rp, mine){
     overlay.innerHTML='';
   }
 
-  // Show status banner for waiting messages
-  if(waitingHtml){
-    status.innerHTML=waitingHtml;
+  // Show status banner for waiting messages + claim button
+  let statusHtml=waitingHtml||'';
+  if(availableClaims.length && !pendingClaim){
+    statusHtml+=`<button class="btn btn-sm btn-gold" style="margin-left:auto;" onclick="startClaim()">📋 Make Claim</button>`;
+  }
+  if(statusHtml){
+    status.innerHTML=statusHtml;
     status.classList.add('open');
   } else {
     status.classList.remove('open');
@@ -1324,7 +1329,7 @@ function renderMatOverlay(phaseHtml, rp, mine){
 
 // ─── PHASE ACTIONS ───────────────────────────────────────────
 function doVote(v){ send({type:'vote',v}); }
-let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[], pendingClaimRound=null;
+let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[], pendingClaimRound=null, availableClaims=[];
 function doPresDiscard(idx){
   presCardsReceived=myRoom.drawnCards?[...myRoom.drawnCards]:null;
   closeCardModal();
@@ -1335,17 +1340,18 @@ function doChanEnact(idx){
   closeCardModal();
   pendingClaimRound=myRoom.round;
   send({type:'chanEnact',enactIdx:idx});
-  pendingClaimQueue=[];
-  if(presCardsReceived) pendingClaimQueue.push('president');
-  pendingClaimQueue.push('chancellor');
-  pendingClaim=pendingClaimQueue.shift();
+  // Don't auto-open claim — store as available
+  availableClaims=[];
+  if(presCardsReceived) availableClaims.push('president');
+  availableClaims.push('chancellor');
 }
-function advanceClaim(){
-  if(pendingClaimQueue.length>0){
-    pendingClaim=pendingClaimQueue.shift();
-    selectedClaim=null;
-    renderPhasePanel();
-  }
+function startClaim(){
+  if(!availableClaims.length) return;
+  pendingClaimQueue=[...availableClaims];
+  availableClaims=[];
+  pendingClaim=pendingClaimQueue.shift();
+  selectedClaim=null;
+  renderPhasePanel();
 }
 
 // ─── CLAIMS ──────────────────────────────────────────────────

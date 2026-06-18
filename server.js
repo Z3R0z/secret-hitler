@@ -2078,8 +2078,11 @@ app.get('/api/room/:code', (req, res) => {
 });
 
 // Invite link: /:code serves index.html so the client can auto-join
-app.get('/:code([A-Za-z0-9]{4})', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/:code', (req, res, next) => {
+  if (/^[A-Za-z0-9]{4}$/.test(req.params.code)) {
+    return res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+  next();
 });
 
 const PORT = process.env.PORT || 3000;

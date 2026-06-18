@@ -922,6 +922,7 @@ function renderGame(){
   document.getElementById('g-code').textContent=r.code;
   document.getElementById('g-name').textContent=r.settings?.gameName?r.settings.gameName+' · ':'';
   document.getElementById('g-round').textContent=`ROUND ${r.round}`;
+  checkPresClaim(r);
   renderPlayers(); renderTracks(); renderElect(); renderPhasePanel(); renderClaimPanel(); renderLog(); loadNotes(); updateTimer(); checkKillSound();
 }
 
@@ -1312,6 +1313,19 @@ function renderMatOverlay(phaseHtml, rp, mine){
   }
 }
 
+// ─── PRESIDENT CLAIM DETECTION ───────────────────────────────
+let _lastEnactCount=0;
+function checkPresClaim(r){
+  const enacts=r.log?r.log.filter(e=>e.type==='chan').length:0;
+  if(enacts>_lastEnactCount && presCardsReceived && !pendingClaim){
+    // A policy was just enacted and we were president with saved cards
+    pendingClaim='president';
+    pendingClaimQueue=[];
+    selectedClaim=null;
+  }
+  _lastEnactCount=enacts;
+}
+
 // ─── PHASE ACTIONS ───────────────────────────────────────────
 function doVote(v){ send({type:'vote',v}); }
 let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[];
@@ -1384,6 +1398,8 @@ function submitClaim(){
   ];
   const cards=combos[selectedClaim];
   send({type:'claim',claimRole:pendingClaim,cards});
+  if(isPres) presCardsReceived=null;
+  else chanCardsReceived=null;
   selectedClaim=null;
   if(pendingClaimQueue.length>0){
     pendingClaim=pendingClaimQueue.shift();
@@ -1400,6 +1416,8 @@ function claimInvestigation(targetName, claimedParty){
 }
 
 function skipClaim(){
+  if(pendingClaim==='president') presCardsReceived=null;
+  if(pendingClaim==='chancellor') chanCardsReceived=null;
   selectedClaim=null;
   if(pendingClaimQueue.length>0){
     pendingClaim=pendingClaimQueue.shift();

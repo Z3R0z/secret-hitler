@@ -163,7 +163,7 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .mat-overlay .claim-title{color:var(--accent);}
 .mat-overlay .claim-combo{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#fff;}
 .mat-overlay .claim-combo:hover{border-color:var(--accent);background:rgba(255,255,255,.1);}
-.mat-overlay .claim-combo.sel{border-color:var(--accent);background:rgba(255,255,255,.12);}
+.mat-overlay .claim-combo.sel{border-color:#fff;background:var(--accent);color:#fff;box-shadow:0 0 12px rgba(184,134,11,.6),0 0 0 3px var(--accent);transform:scale(1.05);}
 .mat-overlay .claim-combo-label{color:rgba(255,255,255,.6);}
 .vote-result-box{text-align:center;padding:.5rem;border-radius:6px;border:1.5px solid;margin-bottom:.35rem;}
 .vote-result-box.ja{background:rgba(22,163,74,.15);border-color:var(--green);}
@@ -255,12 +255,13 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .vote-btns{display:flex;gap:.5rem;flex-wrap:wrap;}
 .vbtn{flex:1;min-width:90px;background:var(--bg2);border:1.5px solid var(--border2);border-radius:5px;color:var(--text);font-family:'Special Elite',monospace;font-size:.95rem;letter-spacing:.1em;padding:.6rem;cursor:pointer;transition:all .18s;text-transform:uppercase;box-shadow:var(--shadow);}
 .vbtn:hover{border-color:var(--border2);transform:translateY(-1px);}
+.vbtn.sel{border-color:#fff;background:var(--accent);color:#fff;box-shadow:0 0 12px rgba(184,134,11,.6),0 0 0 3px var(--accent);transform:scale(1.08);}
 
 /* PLAYER PICKER (card-based) */
 .pick-strip{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:.4rem 0;}
 .pick-card{display:flex;flex-direction:column;align-items:center;background:none;border:none;cursor:pointer;padding:0;transition:all .15s;position:relative;}
-.pick-card:hover{transform:translateY(-4px);}
-.pick-card:hover .pcard-art{box-shadow:0 0 0 3px var(--accent);}
+.pick-card:hover{transform:translateY(-6px) scale(1.05);}
+.pick-card:hover .pcard-art{box-shadow:0 0 14px rgba(184,134,11,.5),0 0 0 3px var(--accent);}
 .pick-card:disabled,.pick-card.disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
 .pick-card .pcard-art{width:80px;height:102px;border-radius:8px;font-size:inherit;}
 .pick-card .role-icon{font-size:2.2rem;}
@@ -409,7 +410,7 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .claim-combos{display:flex;gap:.45rem;flex-wrap:wrap;}
 .claim-combo{display:flex;align-items:center;gap:.5rem;padding:.55rem .85rem;border-radius:6px;border:2px solid var(--border2);background:var(--bg);cursor:pointer;transition:all .18s;font-family:'Crimson Text',serif;font-size:.95rem;color:var(--text);}
 .claim-combo:hover{border-color:var(--accent);background:var(--bg2);}
-.claim-combo.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,.08);background:var(--bg2);}
+.claim-combo.sel{border-color:#fff;background:var(--accent);color:#fff;box-shadow:0 0 12px rgba(184,134,11,.6),0 0 0 3px var(--accent);transform:scale(1.05);}
 .claim-combo.lib{border-color:var(--blue);}
 .claim-combo.fas{border-color:var(--red);}
 .claim-combo.mix{border-color:var(--border2);}
@@ -1266,7 +1267,8 @@ function renderMatOverlay(phaseHtml, rp, mine){
           content+=`<div class="phase-desc">Support this government?</div>
             <div class="vote-btns"><button class="vbtn" onclick="doVote('ja')">✓ JA</button><button class="vbtn" onclick="doVote('nein')">✗ NEIN</button></div>`;
         } else {
-          content+=`<div class="phase-desc">You voted <strong style="color:#fff;">${myVote.toUpperCase()}</strong>. Waiting…</div>`;
+          content+=`<div class="phase-desc">You voted <strong style="color:#fff;">${myVote.toUpperCase()}</strong>. Change?</div>
+            <div class="vote-btns"><button class="vbtn${myVote==='ja'?' sel':''}" onclick="doVote('ja')">✓ JA</button><button class="vbtn${myVote==='nein'?' sel':''}" onclick="doVote('nein')">✗ NEIN</button></div>`;
         }
       }
       content+=`<div class="vote-grid">${alive.map(p=>{ const v=r.votes[p.id]; return `<div class="vote-chip ${v?'voted':'waiting'}">${p.name}: ${v?'✔':'?'}</div>`; }).join('')}</div>`;
@@ -1312,18 +1314,28 @@ function renderMatOverlay(phaseHtml, rp, mine){
 
 // ─── PHASE ACTIONS ───────────────────────────────────────────
 function doVote(v){ send({type:'vote',v}); }
-let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null;
+let presCardsReceived=null, chanCardsReceived=null, pendingClaim=null, pendingClaimQueue=[];
 function doPresDiscard(idx){
   presCardsReceived=myRoom.drawnCards?[...myRoom.drawnCards]:null;
   closeCardModal();
   send({type:'presDiscard',discardIdx:idx});
-  pendingClaim='president';
 }
 function doChanEnact(idx){
   chanCardsReceived=myRoom.passedCardsPrivate?[...myRoom.passedCardsPrivate]:null;
   closeCardModal();
   send({type:'chanEnact',enactIdx:idx});
-  pendingClaim='chancellor';
+  // Queue president claim first, then chancellor
+  pendingClaimQueue=[];
+  if(presCardsReceived) pendingClaimQueue.push('president');
+  pendingClaimQueue.push('chancellor');
+  pendingClaim=pendingClaimQueue.shift();
+}
+function advanceClaim(){
+  if(pendingClaimQueue.length>0){
+    pendingClaim=pendingClaimQueue.shift();
+    selectedClaim=null;
+    renderPhasePanel();
+  }
 }
 
 // ─── CLAIMS ──────────────────────────────────────────────────
@@ -1372,8 +1384,15 @@ function submitClaim(){
   ];
   const cards=combos[selectedClaim];
   send({type:'claim',claimRole:pendingClaim,cards});
-  pendingClaim=null;selectedClaim=null;
-  renderPhasePanel();
+  selectedClaim=null;
+  if(pendingClaimQueue.length>0){
+    pendingClaim=pendingClaimQueue.shift();
+    renderPhasePanel();
+  } else {
+    pendingClaim=null;
+    send({type:'skipClaim'});
+    renderPhasePanel();
+  }
 }
 
 function claimInvestigation(targetName, claimedParty){
@@ -1381,9 +1400,15 @@ function claimInvestigation(targetName, claimedParty){
 }
 
 function skipClaim(){
-  pendingClaim=null;selectedClaim=null;
-  send({type:'skipClaim'});
-  renderPhasePanel();
+  selectedClaim=null;
+  if(pendingClaimQueue.length>0){
+    pendingClaim=pendingClaimQueue.shift();
+    renderPhasePanel();
+  } else {
+    pendingClaim=null;
+    send({type:'skipClaim'});
+    renderPhasePanel();
+  }
 }
 
 // ─── EMOTES ──────────────────────────────────────────────────

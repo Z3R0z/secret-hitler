@@ -57,6 +57,7 @@ function defaultSettings() {
     rebalance: false,
     timedMode: false,
     timerSeconds: 90,
+    rejoinWindow: 60,
   };
 }
 
@@ -407,6 +408,41 @@ function timerExpired(room) {
     startTimer(room);
     broadcastState(room);
   }
+}
+
+// ─── REJOIN WINDOW ────────────────────────────────────────
+function startRejoinTimer(room, player) {
+  if (room.phase !== 'active' || player.isBot || player.dead) return;
+  const window = (room.settings.rejoinWindow || 60) * 1000;
+  if (window <= 0) { replaceWithBot(room, player); return; }
+  clearRejoinTimer(player);
+  addLog(room, { type: 'note', text: `${player.name} disconnected. ${room.settings.rejoinWindow}s to rejoin…`, meta: '' });
+  player._rejoinTimer = setTimeout(() => {
+    player._rejoinTimer = null;
+    if (!rooms.has(room.code) || room.phase !== 'active') return;
+    if (player.connected) return;
+    replaceWithBot(room, player);
+  }, window);
+}
+
+function clearRejoinTimer(player) {
+  if (player._rejoinTimer) { clearTimeout(player._rejoinTimer); player._rejoinTimer = null; }
+}
+
+function replaceWithBot(room, player) {
+  player.isBot = true;
+  player.connected = true;
+  player.name = player.name.replace(/ 🤖$/, '') + ' 🤖';
+  addLog(room, { type: 'note', text: `${player.name} is now controlled by a bot.`, meta: '' });
+  broadcastState(room);
+  const mem = getBotMemory(room, player.id);
+  if (player.role === 'fascist') {
+    room.players.forEach(t => {
+      if (t.id !== player.id && (t.role === 'fascist' || t.role === 'hitler'))
+        if (!mem.knownFascists.includes(t.id)) mem.knownFascists.push(t.id);
+    });
+  }
+  triggerBotActions(room);
 }
 
 // ─── BOT NAMES ────────────────────────────────────────────
@@ -1369,7 +1405,11 @@ wss.on('connection', (ws) => {
       const room = rooms.get(m.roomCode);
       if (room) {
         const p = room.players.find(p => p.id === m.playerId);
-        if (p) { p.connected = false; broadcastState(room); }
+        if (p) {
+          p.connected = false;
+          broadcastState(room);
+          startRejoinTimer(room, p);
+        }
       }
     }
     clients.delete(ws);
@@ -1435,6 +1475,13 @@ function handle(ws, msg) {
       if (!room) return sendWs(ws, { type: 'error', text: 'Room not found' });
       const player = room.players.find(p => p.id === msg.playerId);
       if (!player) return sendWs(ws, { type: 'error', text: 'Player not found' });
+      clearRejoinTimer(player);
+      if (player.isBot && !player.name.includes('🤖')) player.isBot = false;
+      if (player.isBot) {
+        player.isBot = false;
+        player.name = player.name.replace(/ 🤖$/, '');
+        addLog(room, { type: 'note', text: `${player.name} has reconnected and taken back control.`, meta: '' });
+      }
       player.connected = true;
       meta.playerId = player.id; meta.roomCode = room.code;
       room.lastActive = Date.now();
@@ -1449,7 +1496,11 @@ function handle(ws, msg) {
       const room = rooms.get(meta.roomCode);
       if (room) {
         const p = room.players.find(p => p.id === meta.playerId);
-        if (p) { p.connected = false; addLog(room, { type: 'note', text: `${p.name} left.`, meta: '' }); }
+        if (p) {
+          p.connected = false;
+          addLog(room, { type: 'note', text: `${p.name} left.`, meta: '' });
+          startRejoinTimer(room, p);
+        }
         broadcastState(room);
       }
       meta.playerId = null; meta.roomCode = null;
@@ -1527,6 +1578,7 @@ function handle(ws, msg) {
       if (typeof msg.rebalance === 'boolean') s.rebalance = msg.rebalance;
       if (typeof msg.timedMode === 'boolean') s.timedMode = msg.timedMode;
       if (typeof msg.timerSeconds === 'number') s.timerSeconds = Math.max(30, Math.min(300, Math.round(msg.timerSeconds)));
+      if (typeof msg.rejoinWindow === 'number') s.rejoinWindow = Math.max(0, Math.min(300, Math.round(msg.rejoinWindow)));
       room.lastActive = Date.now();
       broadcastState(room);
       break;
@@ -1917,9 +1969,9 @@ function handle(ws, msg) {
       if (claimRole !== 'president' && claimRole !== 'chancellor') return;
       if (!Array.isArray(cards) || cards.length < 1 || cards.length > 3) return;
       if (!cards.every(c => c === 'L' || c === 'F')) return;
-      const cardStr = cards.map(c => c === 'L' ? '🕊L' : '⚡F').join(' ');
-      const label = claimRole === 'president' ? 'President claims drew' : 'Chancellor claims received';
-      addLog(room, { type: 'claim', text: `${player.name} (${claimRole === 'president' ? 'Pres.' : 'Chan.'}): "${label}: ${cardStr}"`, meta: `ROUND ${room.round} · CLAIM` });
+      const cardStr = cards.map(c => c === 'L' ? '<span style="color:#2563eb;font-weight:700;">B</span>' : '<span style="color:#c0392b;font-weight:700;">R</span>').join(' ');
+      const roleLabel = claimRole === 'president' ? 'Pres.' : 'Chan.';
+      addLog(room, { type: 'claim', text: `${player.name} (${roleLabel}): ${cardStr}`, meta: `ROUND ${room.round} · CLAIM` });
       clearClaimWindow(room);
       room.lastActive = Date.now();
       broadcastState(room);

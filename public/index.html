@@ -562,6 +562,21 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
           </select>
           <label class="toggle"><input type="checkbox" id="set-timed" onchange="sendSetting('timedMode',this.checked)"><span class="toggle-track"></span></label>
         </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Rejoin Window</div>
+            <div class="setting-desc">Seconds a disconnected player has to rejoin before a bot takes over (0 = instant bot)</div>
+          </div>
+          <select class="timer-select" id="set-rejoin" onchange="sendSetting('rejoinWindow',parseInt(this.value))">
+            <option value="0">Off</option>
+            <option value="15">15s</option>
+            <option value="30">30s</option>
+            <option value="60" selected>60s</option>
+            <option value="120">120s</option>
+            <option value="180">180s</option>
+            <option value="300">300s</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -810,6 +825,7 @@ function initWaiting(){
   document.getElementById('set-rebalance').disabled=!isH;
   document.getElementById('set-timed').disabled=!isH;
   document.getElementById('set-timer-secs').disabled=!isH;
+  document.getElementById('set-rejoin').disabled=!isH;
   syncSettings();
 }
 
@@ -843,6 +859,7 @@ function syncSettings(){
   document.getElementById('set-rebalance').checked=s.rebalance;
   document.getElementById('set-timed').checked=s.timedMode;
   document.getElementById('set-timer-secs').value=s.timerSeconds||90;
+  document.getElementById('set-rejoin').value=s.rejoinWindow!=null?s.rejoinWindow:60;
 }
 
 let settingsDebounce=null;

@@ -9,7 +9,7 @@
 :root{
   --bg:#fff; --bg2:#f5f5f5; --bg3:#eaeaea;
   --border:#ddd; --border2:#ccc;
-  --text:#111; --text2:#555; --text3:#999;
+  --text:#111; --text2:#555; --text3:#6e6e6e;
   --accent:#b8860b;
   --red:#c0392b; --red-bg:#fef2f2;
   --blue:#2563eb; --blue-bg:#eff6ff;
@@ -19,7 +19,7 @@
 [data-theme="dark"]{
   --bg:#111; --bg2:#1a1a1a; --bg3:#252525;
   --border:#333; --border2:#444;
-  --text:#eee; --text2:#aaa; --text3:#666;
+  --text:#eee; --text2:#aaa; --text3:#999;
   --accent:#d4a017;
   --red:#ef4444; --red-bg:#2a1515;
   --blue:#60a5fa; --blue-bg:#151e2a;
@@ -60,6 +60,9 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .btn-primary{background:var(--red);color:#fff;font-weight:700;}
 .btn-primary:hover{background:var(--red);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15);}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:var(--shadow);}
+.btn-start{font-size:1.2rem;padding:1rem 2.5rem;letter-spacing:.18em;box-shadow:0 0 16px rgba(192,57,43,.3);animation:startPulse 2s ease-in-out infinite;}
+.btn-start:disabled{animation:none;box-shadow:var(--shadow);}
+@keyframes startPulse{0%,100%{box-shadow:0 0 16px rgba(192,57,43,.3);}50%{box-shadow:0 0 28px rgba(192,57,43,.5);}}
 .btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border2);}
 .btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
 .btn-secondary:disabled{opacity:.38;cursor:not-allowed;}
@@ -420,7 +423,7 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .claim-combo.fas{border-color:var(--red);}
 .claim-combo.mix{border-color:var(--border2);}
 .claim-combo-icons{display:flex;gap:.25rem;align-items:center;}
-.claim-card-img{width:28px;height:38px;border-radius:3px;object-fit:contain;}
+.claim-card-img{width:40px;height:54px;border-radius:4px;object-fit:contain;}
 .claim-combo-label{font-family:'Special Elite',monospace;font-size:.68rem;letter-spacing:.06em;color:var(--text2);}
 .claim-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}
 .le-claim{border-left-color:var(--accent);background:var(--bg2);}
@@ -531,7 +534,7 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
       <label class="lbl" id="lbl-cnt">Players</label>
       <div class="count-row" id="wr-cnt-row"></div>
       <div class="row" style="margin-bottom:.8rem;gap:.4rem;">
-        <button class="btn btn-primary" id="wr-start" onclick="doStart()" disabled>Start Game</button>
+        <button class="btn btn-primary btn-start" id="wr-start" onclick="doStart()" disabled>Start Game</button>
         <button class="btn btn-secondary btn-sm" id="wr-shuffle" onclick="send({type:'shuffle'})">🔀 Shuffle</button>
         <button class="btn btn-secondary btn-sm" id="wr-add-bot" onclick="send({type:'addBot'})">🤖 Add Bot</button>
         <button class="btn btn-secondary btn-sm" id="wr-fill-bots" onclick="fillBots()">🤖 Fill Bots</button>

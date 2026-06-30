@@ -6,6 +6,7 @@
 <title>Secret Hitler</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..900&family=Source+Serif+4:opsz,wght@8..60,400..600&family=Archivo+Narrow:wght@400..700&display=swap');
 :root{
   --bg:#fff; --bg2:#f5f5f5; --bg3:#eaeaea;
   --border:#ddd; --border2:#ccc;
@@ -478,37 +479,116 @@ body{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--t
 .hist-winner{font-size:.85rem;flex:1;min-width:0;}
 .hist-empty{text-align:center;color:var(--text3);font-style:italic;font-size:.95rem;padding:1rem;}
 .clear-hist{margin-top:.6rem;text-align:right;}
+
+/* ═══ DOSSIER HOME SCREEN (scoped to #s-lobby only) ═══ */
+#s-lobby.dossier{padding:0;min-height:100vh;position:relative;overflow-x:hidden;}
+#s-lobby.dossier .dossier-bg{position:absolute;inset:0;z-index:0;background-color:var(--bg);background-image:url("https://www.transparenttextures.com/patterns/natural-paper.png");}
+#s-lobby.dossier .dossier-header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:2px solid var(--text);background:var(--bg);}
+#s-lobby.dossier .dossier-title{font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-.03em;text-transform:uppercase;font-size:clamp(1.4rem,4vw,2.1rem);color:var(--red);}
+#s-lobby.dossier .dossier-theme-btn{background:var(--bg2);border:1.5px solid var(--border2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .2s;padding:0;}
+#s-lobby.dossier .dossier-theme-btn:hover{border-color:var(--accent);}
+#s-lobby.dossier .dossier-main{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:2rem 1.25rem 3rem;display:flex;flex-direction:column;gap:2.4rem;}
+#s-lobby.dossier .dossier-status{display:flex;align-items:center;gap:.5rem;font-family:'Archivo Narrow',sans-serif;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);}
+#s-lobby.dossier .dossier-actions{display:grid;grid-template-columns:1fr;gap:1.25rem;}
+@media(min-width:680px){#s-lobby.dossier .dossier-actions{grid-template-columns:1fr 1fr;}}
+#s-lobby.dossier .dossier-card{border:2px solid var(--text);background:var(--bg);padding:1.8rem;display:flex;flex-direction:column;gap:1.1rem;}
+#s-lobby.dossier .dossier-card-primary{border-color:var(--red);background:var(--bg2);}
+#s-lobby.dossier .dossier-eyebrow{font-family:'Archivo Narrow',sans-serif;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--red);}
+#s-lobby.dossier .dossier-card:not(.dossier-card-primary) .dossier-eyebrow{color:var(--text3);}
+#s-lobby.dossier .dossier-h2{font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:-.03em;text-transform:uppercase;font-size:1.7rem;color:var(--text);}
+#s-lobby.dossier .dossier-field{display:flex;flex-direction:column;gap:.35rem;margin-top:auto;}
+#s-lobby.dossier .dossier-label{font-family:'Archivo Narrow',sans-serif;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);}
+#s-lobby.dossier .dossier-input{width:100%;border:none;border-bottom:2px solid var(--text);background:transparent;font-family:'Archivo Narrow',sans-serif;font-size:1.3rem;letter-spacing:.08em;color:var(--text);padding:.4rem 0;}
+#s-lobby.dossier .dossier-input:focus{outline:none;border-bottom-color:var(--red);}
+#s-lobby.dossier .dossier-input::placeholder{color:var(--text3);opacity:.6;}
+#s-lobby.dossier .dossier-input-code{text-align:center;text-transform:uppercase;letter-spacing:.5em;}
+#s-lobby.dossier .dossier-btn{font-family:'Archivo Narrow',sans-serif;font-size:1rem;letter-spacing:.12em;text-transform:uppercase;padding:.9rem 1.5rem;border:2px solid var(--red);cursor:pointer;transition:all .15s;text-align:center;width:100%;}
+#s-lobby.dossier .dossier-btn-primary{background:var(--red);color:#fff;font-weight:700;}
+#s-lobby.dossier .dossier-btn-primary:hover{background:transparent;color:var(--red);}
+#s-lobby.dossier .dossier-btn-secondary{background:transparent;color:var(--text);border-color:var(--text);}
+#s-lobby.dossier .dossier-btn-secondary:hover{background:var(--text);color:var(--bg);}
+#s-lobby.dossier .dossier-btn:active{transform:translate(2px,2px);}
+#s-lobby.dossier .dossier-section{display:flex;flex-direction:column;gap:1rem;}
+#s-lobby.dossier .dossier-section-hdr{display:flex;align-items:center;gap:.8rem;}
+#s-lobby.dossier .dossier-section-hdr h3{font-family:'Archivo Narrow',sans-serif;font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--red);white-space:nowrap;margin:0;}
+#s-lobby.dossier .dossier-divider{flex:1;height:2px;background:var(--text);opacity:.2;}
+#s-lobby.dossier .dossier-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
+@media(min-width:560px){#s-lobby.dossier .dossier-stats{grid-template-columns:repeat(4,1fr);}}
+#s-lobby.dossier .dossier-stat{border:1.5px solid var(--border2);background:var(--bg);padding:1.1rem .8rem;display:flex;flex-direction:column;align-items:center;gap:.2rem;}
+#s-lobby.dossier .dossier-stat-tag{font-family:'Archivo Narrow',sans-serif;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--red);opacity:.6;}
+#s-lobby.dossier .dossier-stat-win .dossier-stat-tag,#s-lobby.dossier .dossier-stat-win .dossier-stat-num{color:var(--green);}
+#s-lobby.dossier .dossier-stat-num{font-family:'DM Sans',sans-serif;font-size:2.1rem;font-weight:800;color:var(--text);line-height:1;margin:.2rem 0;}
+#s-lobby.dossier .dossier-stat-lbl{font-family:'Archivo Narrow',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+#s-lobby.dossier .dossier-history{display:flex;flex-direction:column;gap:.5rem;max-height:320px;overflow-y:auto;padding-right:3px;}
+#s-lobby.dossier .dossier-history .hist-item{display:flex;align-items:center;gap:.7rem;border:1.5px solid var(--border2);background:var(--bg);padding:.7rem .9rem;font-family:'Source Serif 4',serif;font-size:.95rem;}
+#s-lobby.dossier .dossier-history .hist-item.win{border-left:4px solid var(--green);}
+#s-lobby.dossier .dossier-history .hist-item.loss{border-left:4px solid var(--red);}
+#s-lobby.dossier .dossier-history .hist-result{font-family:'Archivo Narrow',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;width:38px;text-align:center;flex-shrink:0;}
+#s-lobby.dossier .dossier-history .hist-item.win .hist-result{color:var(--green);}
+#s-lobby.dossier .dossier-history .hist-item.loss .hist-result{color:var(--red);}
+#s-lobby.dossier .dossier-history .hist-role{font-family:'Archivo Narrow',sans-serif;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .45rem;border-radius:20px;flex-shrink:0;}
+#s-lobby.dossier .dossier-history .hist-role.lib{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue);}
+#s-lobby.dossier .dossier-history .hist-role.fas{background:var(--red-bg);color:var(--red);border:1px solid var(--red);}
+#s-lobby.dossier .dossier-history .hist-role.hit{background:var(--bg2);color:var(--accent);border:1px solid var(--accent);}
+#s-lobby.dossier .dossier-history .hist-winner{flex:1;min-width:0;}
+#s-lobby.dossier .dossier-history .hist-date{font-family:'Archivo Narrow',sans-serif;font-size:.64rem;color:var(--text3);margin-left:auto;flex-shrink:0;}
+#s-lobby.dossier .dossier-history .hist-empty{text-align:center;font-style:italic;color:var(--text3);padding:2rem 1rem;border:2px dashed var(--border2);font-family:'Source Serif 4',serif;}
+#s-lobby.dossier .dossier-clear{text-align:right;}
+#s-lobby.dossier .dossier-link-btn{background:none;border:1px solid var(--red);color:var(--red);font-family:'Archivo Narrow',sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .8rem;cursor:pointer;transition:all .15s;}
+#s-lobby.dossier .dossier-link-btn:hover{background:var(--red);color:#fff;}
 </style>
 </head>
 <body>
 
 <!-- ══ LOBBY ══ -->
-<div class="screen active lobby-bg" id="s-lobby">
-  <div class="hdr"><div class="title">SECRET HITLER</div><button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button></div>
-  <div class="wrap">
-    <div class="conn-bar"><span class="cdot" id="cdot"></span><span id="clbl">Connecting…</span></div>
-    <label class="lbl">Your Name</label>
-    <input class="fi" id="l-name" placeholder="Enter your name…" maxlength="20" autocomplete="off">
-    <button class="btn btn-primary btn-block" onclick="doCreate()">Create New Game</button>
-    <div class="divider">OR JOIN EXISTING</div>
-    <label class="lbl">Room Code</label>
-    <input class="fi" id="l-code" placeholder="ABCD" maxlength="6"
-      style="text-transform:uppercase;letter-spacing:.25em;font-family:'Special Elite',monospace;font-size:1.3rem;"
-      autocomplete="off" oninput="this.value=this.value.toUpperCase()">
-    <button class="btn btn-secondary btn-block" onclick="doJoin()">Join Game</button>
+<div class="screen active dossier" id="s-lobby">
+  <div class="dossier-bg" aria-hidden="true"></div>
+
+  <div class="dossier-header">
+    <div class="dossier-title">SECRET HITLER</div>
+    <button class="theme-toggle dossier-theme-btn" onclick="toggleTheme()" title="Toggle dark/light mode"></button>
+  </div>
+
+  <div class="dossier-main">
+    <div class="dossier-status"><span class="cdot" id="cdot"></span><span id="clbl">Connecting…</span></div>
+
+    <div class="dossier-actions">
+      <div class="dossier-card dossier-card-primary">
+        <div class="dossier-eyebrow">Initiate Session</div>
+        <h2 class="dossier-h2">New Protocol</h2>
+        <div class="dossier-field">
+          <label class="dossier-label">Designate Identity</label>
+          <input class="dossier-input" id="l-name" placeholder="Enter your name…" maxlength="20" autocomplete="off">
+        </div>
+        <button class="dossier-btn dossier-btn-primary" onclick="doCreate()">Create New Game</button>
+      </div>
+
+      <div class="dossier-card">
+        <div class="dossier-eyebrow">Existing Protocol</div>
+        <h2 class="dossier-h2">Enter Room</h2>
+        <div class="dossier-field">
+          <label class="dossier-label">Protocol Code</label>
+          <input class="dossier-input dossier-input-code" id="l-code" placeholder="ABCD" maxlength="6" autocomplete="off" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <button class="dossier-btn dossier-btn-secondary" onclick="doJoin()">Join Game</button>
+      </div>
+    </div>
 
     <!-- PROFILE & HISTORY -->
-    <div class="profile-section">
-      <div class="lbl">Your Stats</div>
-      <div class="profile-stats">
-        <div class="stat-box"><div class="stat-num" id="stat-games">0</div><div class="stat-lbl">Games</div></div>
-        <div class="stat-box wins"><div class="stat-num" id="stat-wins">0</div><div class="stat-lbl">Wins</div></div>
-        <div class="stat-box losses"><div class="stat-num" id="stat-losses">0</div><div class="stat-lbl">Losses</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-rate">—</div><div class="stat-lbl">Win %</div></div>
+    <div class="dossier-section">
+      <div class="dossier-section-hdr"><h3>Your Stats</h3><div class="dossier-divider"></div></div>
+      <div class="dossier-stats">
+        <div class="dossier-stat"><span class="dossier-stat-tag">Classified</span><span class="dossier-stat-num" id="stat-games">0</span><span class="dossier-stat-lbl">Games</span></div>
+        <div class="dossier-stat dossier-stat-win"><span class="dossier-stat-tag">Confidential</span><span class="dossier-stat-num" id="stat-wins">0</span><span class="dossier-stat-lbl">Wins</span></div>
+        <div class="dossier-stat"><span class="dossier-stat-tag">Classified</span><span class="dossier-stat-num" id="stat-losses">0</span><span class="dossier-stat-lbl">Losses</span></div>
+        <div class="dossier-stat"><span class="dossier-stat-tag">Internal Use</span><span class="dossier-stat-num" id="stat-rate">—</span><span class="dossier-stat-lbl">Win %</span></div>
       </div>
-      <div class="lbl">Game History</div>
-      <div class="history-list" id="history-list"></div>
-      <div class="clear-hist"><button class="btn btn-sm btn-danger" onclick="clearHistory()">Clear History</button></div>
+    </div>
+
+    <div class="dossier-section">
+      <div class="dossier-section-hdr"><h3>Game History</h3><div class="dossier-divider"></div></div>
+      <div class="dossier-history" id="history-list"></div>
+      <div class="dossier-clear"><button class="dossier-link-btn" onclick="clearHistory()">Clear History</button></div>
     </div>
   </div>
 </div>

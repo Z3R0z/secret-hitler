@@ -10,7 +10,11 @@
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["secret-hitler", "board-game", "multiplayer"],
+  "keywords": [
+    "secret-hitler",
+    "board-game",
+    "multiplayer"
+  ],
   "license": "MIT",
   "dependencies": {
     "express": "^5.2.1",
